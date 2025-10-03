@@ -1,5 +1,7 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import Link from "next/link"
+import Image from "next/image"
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -19,10 +21,12 @@ export default async function DashboardPage() {
             <h2 className="text-xl font-semibold mb-4">Your Profile</h2>
             <div className="space-y-2">
               {session.user?.image && (
-                <img 
+                <Image 
                   src={session.user.image} 
                   alt="Profile" 
-                  className="w-20 h-20 rounded-full"
+                  width={80}
+                  height={80}
+                  className="rounded-full"
                 />
               )}
               <p><strong>Name:</strong> {session.user?.name || 'N/A'}</p>
@@ -31,12 +35,12 @@ export default async function DashboardPage() {
           </div>
 
           <div className="mt-6">
-            <a 
+            <Link 
               href="/api/auth/signout"
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 inline-block"
             >
               Sign Out
-            </a>
+            </Link>
           </div>
         </div>
       </div>

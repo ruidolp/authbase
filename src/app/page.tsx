@@ -19,12 +19,12 @@ export default async function Home() {
               >
                 Go to Dashboard
               </Link>
-              <a 
+              <Link 
                 href="/api/auth/signout"
                 className="px-6 py-3 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
               >
                 Sign Out
-              </a>
+              </Link>
             </>
           ) : (
             <Link 
