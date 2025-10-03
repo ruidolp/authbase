@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// TABLAS EXISTENTES (Videos)
+// ============================================
+
+model videos {
+  id         Int       @id @default(autoincrement())
+  video_id   String    @unique
+  nombre     String
+  url        String
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model watch_sessions {
+  id              Int       @id @default(autoincrement())
+  video_id        String
+  video_nombre    String
+  started_at      DateTime  @default(now()) @db.Timestamp(6)
+  ended_at        DateTime? @db.Timestamp(6)
+  seconds_watched Int?      @default(0)
+  watch_date      DateTime  @default(dbgenerated("CURRENT_DATE")) @db.Date
+  completed       Boolean?  @default(false)
+  created_at      DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([created_at(sort: Desc)], map: "idx_created_at")
+  @@index([video_id], map: "idx_video_id")
+  @@index([watch_date], map: "idx_watch_date")
+  @@index([watch_date, video_id], map: "idx_watch_date_video")
+}
+
+// ============================================
+// TABLAS DE AUTH (NextAuth)
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
