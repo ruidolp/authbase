@@ -116,12 +116,10 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
         events: {
           onReady: (event) => {
             console.log('Player listo')
-            // Intentar autoplay al estar listo
-            event.target.playVideo()
           },
-          onStateChange: onPlayerStateChange,
-          onError: (event) => {
-            console.error('Error en player:', event.data)
+            onStateChange: onPlayerStateChange,
+            onError: (event: { data: number }) => {
+              console.error('Error en player:', event.data)
           }
         },
       })
