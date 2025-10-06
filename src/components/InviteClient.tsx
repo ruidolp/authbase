@@ -48,7 +48,7 @@ export function InviteClient({ invitation, session }: InviteClientProps) {
       // Redirigir a login con callback a dashboard
       window.location.href = '/login?callbackUrl=/dashboard'
       
-    } catch (err) {
+    } catch {
       setError("Error de conexión")
       setLoading(false)
     }

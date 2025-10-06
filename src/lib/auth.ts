@@ -37,7 +37,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   
   callbacks: {
-async jwt({ token, user, account, trigger }) {
+async jwt({ token, user }) {
   // Si es un nuevo login y tenemos el user
   if (user?.id) {
     // Buscar el usuario en la DB

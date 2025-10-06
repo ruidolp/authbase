@@ -13,7 +13,9 @@ import {
 
 declare global {
   interface Window {
-    YT: any
+  YT: {
+    Player: new (elementId: string, config: unknown) => unknown
+  }
     onYouTubeIframeAPIReady: () => void
   }
 }
@@ -31,7 +33,7 @@ interface WatchClientProps {
   initialVideos: Video[]
 }
 
-export function WatchClient({ familyId, familyName, initialVideos }: WatchClientProps) {
+export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
   const { data: session } = useSession()
   const [videos] = useState<Video[]>(initialVideos)
   const [displayedVideos, setDisplayedVideos] = useState<Video[]>([])
@@ -39,7 +41,7 @@ export function WatchClient({ familyId, familyName, initialVideos }: WatchClient
   const [searchQuery, setSearchQuery] = useState("")
   const [visibleCount, setVisibleCount] = useState(10)
   
-  const playerRef = useRef<any>(null)
+  const playerRef = useRef<YT.Player | null>(null)
   const videoContainerRef = useRef<HTMLDivElement>(null)
   const sessionIdRef = useRef<number | null>(null)
   const startTimeRef = useRef<number | null>(null)
@@ -171,7 +173,7 @@ export function WatchClient({ familyId, familyName, initialVideos }: WatchClient
     }
   }
 
-  function onPlayerStateChange(event: any) {
+  function onPlayerStateChange(event: { data: number }) {
     if (displayedVideos.length === 0) return
     const video = displayedVideos[currentIndex]
     
