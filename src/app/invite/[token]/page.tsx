@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { redirect } from "next/navigation"
 import { InviteClient } from "@/components/InviteClient"
+import Link from "next/link"
 
 interface PageProps {
   params: Promise<{ token: string }>
@@ -32,12 +32,12 @@ export default async function InvitePage({ params }: PageProps) {
           <p className="text-gray-600 mb-4">
             Este link de invitación no existe o ya expiró.
           </p>
-          <a 
-            href="/api/auth/signin"
+          <Link 
+            href="/login"
             className="block w-full text-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
           >
             Ir a inicio de sesión
-          </a>
+          </Link>
         </div>
       </div>
     )

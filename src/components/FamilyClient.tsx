@@ -39,7 +39,7 @@ interface FamilyClientProps {
   invitations: Invitation[]
 }
 
-export function FamilyClient({ currentUser, family, members, invitations }: FamilyClientProps) {
+export function FamilyClient({ currentUser, members, invitations }: FamilyClientProps) {
   const router = useRouter()
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
@@ -84,8 +84,8 @@ export function FamilyClient({ currentUser, family, members, invitations }: Fami
       setShowSuccessModal(true)
       setInviteEmail("")
       router.refresh()
-    } catch (err) {
-      setError("Error de conexión")
+    } catch {
+      console.error('Error removiendo miembro')
     } finally {
       setLoading(false)
     }

@@ -16,7 +16,6 @@ interface InviteClientProps {
 }
 
 export function InviteClient({ invitation, session }: InviteClientProps) {
-  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 

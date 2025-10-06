@@ -18,7 +18,7 @@ export function EditFamilyForm({ familyName, familySlug }: EditFamilyFormProps) 
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError("")
     setSuccess("")
