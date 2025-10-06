@@ -1,33 +1,28 @@
-import { auth } from "@/lib/auth"
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-export default auth((req) => {
-  const isLoggedIn = !!req.auth
-  
-  console.log('🔍 Middleware:', {
-    path: req.nextUrl.pathname,
-    isLoggedIn,
-    hasAuth: !!req.auth,
-    userId: req.auth?.user?.id
-  })
-  
-  const isAuthPage = req.nextUrl.pathname.startsWith('/login')
+export function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname
+  const token = request.cookies.get('authjs.session-token')?.value || 
+                request.cookies.get('__Secure-authjs.session-token')?.value
+
+  const isLoggedIn = !!token
+  const isAuthPage = path.startsWith('/login')
   const isDashboardRoute = 
-    req.nextUrl.pathname.startsWith('/dashboard') ||
-    req.nextUrl.pathname.startsWith('/videos') ||
-    req.nextUrl.pathname.startsWith('/stats') ||
-    req.nextUrl.pathname.startsWith('/editor') ||
-    req.nextUrl.pathname.startsWith('/family')
+    path.startsWith('/dashboard') ||
+    path.startsWith('/editor') ||
+    path.startsWith('/family')
 
   if (isDashboardRoute && !isLoggedIn) {
-    console.log('❌ Redirigiendo a /login desde middleware')
-    return Response.redirect(new URL('/login', req.nextUrl))
+    return NextResponse.redirect(new URL('/login', request.url))
   }
 
   if (isAuthPage && isLoggedIn) {
-    console.log('✅ Ya logueado, redirigiendo a /dashboard')
-    return Response.redirect(new URL('/dashboard', req.nextUrl))
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
-})
+
+  return NextResponse.next()
+}
 
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico|watch).*)'],
