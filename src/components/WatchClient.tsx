@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import Image from "next/image"
 import { Search, User } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
@@ -37,7 +38,7 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [searchQuery, setSearchQuery] = useState("")
   const [visibleCount, setVisibleCount] = useState(10)
-  
+
   const playerRef = useRef<YT.Player | null>(null)
   const videoContainerRef = useRef<HTMLDivElement>(null)
   const sessionIdRef = useRef<number | null>(null)
@@ -52,62 +53,74 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
   useEffect(() => {
     if (displayedVideos.length === 0) return
 
-    const tag = document.createElement('script')
-    tag.src = 'https://www.youtube.com/iframe_api'
-    const firstScriptTag = document.getElementsByTagName('script')[0]
-    firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag)
+    // --- función local: evita warning de deps por "initPlayer" ---
+    function initPlayer() {
+      if (displayedVideos.length === 0 || !window.YT) return
 
-    window.onYouTubeIframeAPIReady = () => {
+      try {
+        playerRef.current = new window.YT.Player("player", {
+          height: "100%",
+          width: "100%",
+          videoId: displayedVideos[0].video_id,
+          playerVars: {
+            autoplay: 1,
+            controls: 1,
+            rel: 0,
+            modestbranding: 1,
+            fs: 1,
+            enablejsapi: 1,
+          },
+          events: {
+            onStateChange: onPlayerStateChange,
+          },
+        })
+      } catch (error) {
+        console.error("Error initializing player:", error)
+      }
+    }
+
+    const SCRIPT_SRC = "https://www.youtube.com/iframe_api"
+    const existing = document.querySelector(
+      `script[src="${SCRIPT_SRC}"]`
+    ) as HTMLScriptElement | null
+
+    if (existing && window.YT && typeof window.YT.Player === "function") {
       initPlayer()
+    } else {
+      if (!existing) {
+        const tag = document.createElement("script")
+        tag.src = SCRIPT_SRC
+        const firstScriptTag = document.getElementsByTagName("script")[0]
+        firstScriptTag?.parentNode?.insertBefore(tag, firstScriptTag || null)
+      }
+      window.onYouTubeIframeAPIReady = () => {
+        initPlayer()
+      }
     }
 
     return () => {
       if (playerRef.current?.destroy) playerRef.current.destroy()
-      delete (window as any).onYouTubeIframeAPIReady
+      // borrar la propiedad tipada, sin any
+      delete (window as Window & { onYouTubeIframeAPIReady?: () => void }).onYouTubeIframeAPIReady
     }
   }, [displayedVideos])
 
   function shuffleArray(array: Video[]) {
     const shuffled = [...array]
     for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
     }
     return shuffled
   }
 
-  function initPlayer() {
-    if (displayedVideos.length === 0 || !window.YT) return
-
-    try {
-      playerRef.current = new window.YT.Player('player', {
-        height: '100%',
-        width: '100%',
-        videoId: displayedVideos[0].video_id,
-        playerVars: {
-          autoplay: 1,
-          controls: 1,
-          rel: 0,
-          modestbranding: 1,
-          fs: 1,
-          enablejsapi: 1,
-        },
-        events: {
-          onStateChange: onPlayerStateChange,
-        },
-      })
-    } catch (error) {
-      console.error('Error initializing player:', error)
-    }
-  }
-
   async function startWatchSession(video: Video) {
     try {
-      const response = await fetch('/api/watch-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/watch-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'start',
+          action: "start",
           videoId: video.id,
           videoName: video.nombre,
           familyId: familyId,
@@ -122,7 +135,7 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
         isTrackingRef.current = true
       }
     } catch (error) {
-      console.error('Error starting session:', error)
+      console.error("Error starting session:", error)
     }
   }
 
@@ -149,11 +162,11 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
     }
 
     try {
-      await fetch('/api/watch-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      await fetch("/api/watch-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'end',
+          action: "end",
           sessionId: sessionIdRef.current,
           seconds: accumulatedSecondsRef.current,
           completed,
@@ -165,14 +178,15 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
       accumulatedSecondsRef.current = 0
       isTrackingRef.current = false
     } catch (error) {
-      console.error('Error ending session:', error)
+      console.error("Error ending session:", error)
     }
   }
 
-  function onPlayerStateChange(event: { data: number }) {
+  function onPlayerStateChange(event: YT.OnStateChangeEvent) {
     if (displayedVideos.length === 0) return
     const video = displayedVideos[currentIndex]
-    
+
+    // 1 = playing, 2 = paused, 0 = ended
     if (event.data === 1) {
       if (!isTrackingRef.current) {
         startWatchSession(video)
@@ -209,68 +223,57 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
   }
 
   function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
     const query = searchQuery.toLowerCase().trim()
-    
+
     if (!query) {
       setDisplayedVideos(shuffleArray([...videos]))
     } else {
-      const filtered = videos.filter(v => 
+      const filtered = videos.filter((v) =>
         v.nombre.toLowerCase().includes(query)
       )
       setDisplayedVideos(filtered)
     }
-    
+
     setCurrentIndex(0)
     setVisibleCount(10)
   }
 
   function loadMore() {
-    setVisibleCount(prev => prev + 10)
+    setVisibleCount((prev) => prev + 10)
   }
 
-useEffect(() => {
-  const handleBeforeUnload = () => {
-    if (isTrackingRef.current && sessionIdRef.current) {
-      let finalSeconds = accumulatedSecondsRef.current
-      if (startTimeRef.current) {
-        finalSeconds += Math.floor((Date.now() - startTimeRef.current) / 1000)
-      }
-      
-      // Usar sendBeacon con FormData como alternativa más confiable
-      const formData = new FormData()
-      formData.append('action', 'end')
-      formData.append('sessionId', sessionIdRef.current.toString())
-      formData.append('seconds', finalSeconds.toString())
-      formData.append('completed', 'false')
-      
-      // Intentar sendBeacon, si falla, usar fetch síncrono
-      try {
-        const data = JSON.stringify({
-          action: 'end',
-          sessionId: sessionIdRef.current,
-          seconds: finalSeconds,
-          completed: false,
-        })
-        
-        const blob = new Blob([data], { type: 'application/json' })
-        navigator.sendBeacon('/api/watch-session', blob)
-      } catch (error) {
-        console.error('Error en sendBeacon:', error)
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (isTrackingRef.current && sessionIdRef.current) {
+        let finalSeconds = accumulatedSecondsRef.current
+        if (startTimeRef.current) {
+          finalSeconds += Math.floor((Date.now() - startTimeRef.current) / 1000)
+        }
+
+        try {
+          const data = JSON.stringify({
+            action: "end",
+            sessionId: sessionIdRef.current,
+            seconds: finalSeconds,
+            completed: false,
+          })
+
+          const blob = new Blob([data], { type: "application/json" })
+          navigator.sendBeacon("/api/watch-session", blob)
+        } catch (error) {
+          console.error("Error en sendBeacon:", error)
+        }
       }
     }
-  }
 
-  window.addEventListener('beforeunload', handleBeforeUnload)
-  return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-}, [])
-
-
-
+    window.addEventListener("beforeunload", handleBeforeUnload)
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload)
+  }, [])
 
   const currentVideo = displayedVideos[currentIndex]
 
@@ -333,25 +336,25 @@ useEffect(() => {
 
       {/* Main content */}
       <div className="max-w-full">
-{/* Video arriba - modo cine */}
-<div ref={videoContainerRef} className="w-full">
-  <div className="bg-black overflow-hidden mb-4">
-    <div className="relative w-full" style={{ paddingBottom: '45%' }}>
-      <div 
-        id="player" 
-        className="absolute top-0 left-0 w-full h-full"
-      ></div>
-    </div>
-  </div>
+        {/* Video arriba - modo cine */}
+        <div ref={videoContainerRef} className="w-full">
+          <div className="bg-black overflow-hidden mb-4">
+            <div className="relative w-full" style={{ paddingBottom: "45%" }}>
+              <div
+                id="player"
+                className="absolute top-0 left-0 w-full h-full"
+              ></div>
+            </div>
+          </div>
 
-  {currentVideo && (
-    <div className="px-6 py-4">
-      <h1 className="text-2xl font-semibold text-gray-900">
-        {currentVideo.nombre}
-      </h1>
-    </div>
-  )}
-</div>
+          {currentVideo && (
+            <div className="px-6 py-4">
+              <h1 className="text-2xl font-semibold text-gray-900">
+                {currentVideo.nombre}
+              </h1>
+            </div>
+          )}
+        </div>
 
         {/* Abajo: espacio vacío izquierda + sidebar derecha */}
         <div className="flex px-6 pb-6">
@@ -364,26 +367,37 @@ useEffect(() => {
               <p className="text-sm text-gray-600">{displayedVideos.length} videos</p>
             </div>
 
-            <div className="p-4 space-y-3 overflow-y-auto" style={{ maxHeight: '600px' }}>
+            <div
+              className="p-4 space-y-3 overflow-y-auto"
+              style={{ maxHeight: "600px" }}
+            >
               {displayedVideos.slice(0, visibleCount).map((video, index) => (
                 <div
                   key={video.id}
                   onClick={() => playVideo(index)}
                   className={`flex space-x-3 p-3 rounded-lg cursor-pointer transition-colors ${
                     index === currentIndex
-                      ? 'bg-white border-l-4 border-gray-900'
-                      : 'hover:bg-white'
+                      ? "bg-white border-l-4 border-gray-900"
+                      : "hover:bg-white"
                   }`}
                 >
-                  <img
-                    src={`https://img.youtube.com/vi/${video.video_id}/mqdefault.jpg`}
-                    alt={video.nombre}
-                    className="w-40 h-24 object-cover rounded"
-                  />
+                  <div className="relative w-40 h-24">
+                    <Image
+                      src={`https://img.youtube.com/vi/${video.video_id}/mqdefault.jpg`}
+                      alt={video.nombre}
+                      fill
+                      className="object-cover rounded"
+                      sizes="160px"
+                    />
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className={`text-sm font-medium line-clamp-2 ${
-                      index === currentIndex ? 'text-gray-900 font-semibold' : 'text-gray-700'
-                    }`}>
+                    <h3
+                      className={`text-sm font-medium line-clamp-2 ${
+                        index === currentIndex
+                          ? "text-gray-900 font-semibold"
+                          : "text-gray-700"
+                      }`}
+                    >
                       {video.nombre}
                     </h3>
                   </div>
