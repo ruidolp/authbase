@@ -62,103 +62,96 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
   }, [videos])
 
   useEffect(() => {
-  if (displayedVideos.length === 0) return
-
-  function onPlayerStateChange(event: { data: number }) {
     if (displayedVideos.length === 0) return
-    const video = displayedVideos[currentIndex]
 
-    if (event.data === 1) {
-      if (!isTrackingRef.current) {
-        startWatchSession(video)
-      } else {
-        resumeTracking()
+    function onPlayerStateChange(event: { data: number }) {
+      if (displayedVideos.length === 0) return
+      const video = displayedVideos[currentIndex]
+
+      if (event.data === 1) {
+        if (!isTrackingRef.current) {
+          startWatchSession(video)
+        } else {
+          resumeTracking()
+        }
+      } else if (event.data === 2) {
+        pauseTracking()
+      } else if (event.data === 0) {
+        endWatchSession(true)
+        setTimeout(() => playNextVideo(), 1000)
       }
-    } else if (event.data === 2) {
-      pauseTracking()
-    } else if (event.data === 0) {
-      endWatchSession(true)
-      setTimeout(() => playNextVideo(), 1000)
-    }
-  }
-
-  function initPlayer() {
-    if (!window.YT || !window.YT.Player) {
-      console.log('YT.Player no disponible aún')
-      return
     }
 
-    if (displayedVideos.length === 0) {
-      console.log('No hay videos para reproducir')
-      return
-    }
+    function initPlayer() {
+      if (!window.YT || !window.YT.Player) {
+        console.log('YT.Player no disponible aún')
+        return
+      }
 
-    // Destruir player existente si hay uno
-    if (playerRef.current?.destroy) {
-      playerRef.current.destroy()
-    }
+      if (displayedVideos.length === 0) {
+        console.log('No hay videos para reproducir')
+        return
+      }
 
-    try {
       console.log('Inicializando player con video:', displayedVideos[0].video_id)
       
-      playerRef.current = new window.YT.Player("player", {
-        height: "100%",
-        width: "100%",
-        videoId: displayedVideos[0].video_id,
-        playerVars: {
-          autoplay: 1,
-          controls: 1,
-          rel: 0,
-          modestbranding: 1,
-          fs: 1,
-          enablejsapi: 1,
-        },
-        events: {
-          onReady: () => {
-            console.log('Player listo')
+      try {
+        playerRef.current = new window.YT.Player("player", {
+          height: "100%",
+          width: "100%",
+          videoId: displayedVideos[0].video_id,
+          playerVars: {
+            autoplay: 1,
+            controls: 1,
+            rel: 0,
+            modestbranding: 1,
+            fs: 1,
+            enablejsapi: 1,
           },
+          events: {
+            onReady: () => {
+              console.log('Player listo')
+            },
             onStateChange: onPlayerStateChange,
             onError: (event: { data: number }) => {
               console.error('Error en player:', event.data)
-          }
-        },
-      })
-    } catch (error) {
-      console.error("Error initializing player:", error)
-    }
-  }
-
-  // Verificar si YT ya está cargado
-  if (window.YT && window.YT.Player) {
-    console.log('YT ya está cargado, inicializando player')
-    initPlayer()
-  } else {
-    console.log('Cargando script de YouTube API')
-    
-    // Cargar script solo si no existe
-    const existingScript = document.querySelector('script[src="https://www.youtube.com/iframe_api"]')
-    
-    if (!existingScript) {
-      const tag = document.createElement("script")
-      tag.src = "https://www.youtube.com/iframe_api"
-      const firstScriptTag = document.getElementsByTagName("script")[0]
-      firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag)
+            }
+          },
+        })
+      } catch (error) {
+        console.error("Error initializing player:", error)
+      }
     }
 
-    window.onYouTubeIframeAPIReady = () => {
-      console.log('YouTube API lista')
+    if (window.YT && window.YT.Player) {
+      console.log('YT ya está cargado, inicializando player')
       initPlayer()
-    }
-  }
+    } else {
+      console.log('Cargando script de YouTube API')
+      
+      const existingScript = document.querySelector('script[src="https://www.youtube.com/iframe_api"]')
+      
+      if (!existingScript) {
+        const tag = document.createElement("script")
+        tag.src = "https://www.youtube.com/iframe_api"
+        const firstScriptTag = document.getElementsByTagName("script")[0]
+        firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag)
+      }
 
-  return () => {
-    if (playerRef.current?.destroy) {
-      playerRef.current.destroy()
-      playerRef.current = null
+      window.onYouTubeIframeAPIReady = () => {
+        console.log('YouTube API lista')
+        initPlayer()
+      }
     }
-  }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [displayedVideos, currentIndex])
+
+    return () => {
+      if (playerRef.current?.destroy) {
+        playerRef.current.destroy()
+        playerRef.current = null
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayedVideos])
 
   function shuffleArray(array: Video[]) {
     const shuffled = [...array]
@@ -247,24 +240,21 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
     scrollToTop()
   }
 
-function playVideo(index: number) {
-  if (isTrackingRef.current) {
-    endWatchSession(false)
-  }
-  
-  setCurrentIndex(index)
-  
-  // Esperar un momento para que React actualice el estado
-  setTimeout(() => {
+  function playVideo(index: number) {
+    if (isTrackingRef.current) {
+      endWatchSession(false)
+    }
+    
+    setCurrentIndex(index)
+    scrollToTop()
+    
     if (playerRef.current?.loadVideoById) {
       console.log('Cargando video:', displayedVideos[index].video_id)
       playerRef.current.loadVideoById(displayedVideos[index].video_id)
-      scrollToTop()
     } else {
       console.error('Player no disponible para cargar video')
     }
-  }, 100)
-}
+  }
 
   function scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" })
