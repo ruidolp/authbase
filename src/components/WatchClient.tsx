@@ -11,15 +11,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-declare global {
-  interface Window {
-  YT: {
-    Player: new (elementId: string, config: unknown) => unknown
-  }
-    onYouTubeIframeAPIReady: () => void
-  }
-}
-
 interface Video {
   id: number
   video_id: string
