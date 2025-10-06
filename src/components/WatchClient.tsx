@@ -114,7 +114,7 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
           enablejsapi: 1,
         },
         events: {
-          onReady: (event) => {
+          onReady: () => {
             console.log('Player listo')
           },
             onStateChange: onPlayerStateChange,
