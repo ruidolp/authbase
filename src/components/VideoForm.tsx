@@ -37,7 +37,7 @@ export function VideoForm({ onVideoAdded }: VideoFormProps) {
         body: JSON.stringify({ nombre: nombre.trim(), url: url.trim() }),
       })
 
-      const data = await response.json()
+      const data: { error?: string } = await response.json()
 
       if (!response.ok) {
         throw new Error(data.error || "Error al guardar el video")
@@ -46,8 +46,12 @@ export function VideoForm({ onVideoAdded }: VideoFormProps) {
       setNombre("")
       setUrl("")
       onVideoAdded()
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError("Error desconocido")
+      }
     } finally {
       setLoading(false)
     }
@@ -56,7 +60,7 @@ export function VideoForm({ onVideoAdded }: VideoFormProps) {
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
       <h2 className="text-lg font-semibold text-gray-900 mb-4">Agregar nuevo video</h2>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">

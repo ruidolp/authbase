@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { ExternalLink, Trash2, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -18,6 +19,7 @@ interface VideoCardProps {
 
 export function VideoCard({ video, onVideoDeleted }: VideoCardProps) {
   const [deleting, setDeleting] = useState(false)
+  const [error, setError] = useState("")
 
   async function handleDelete() {
     if (!confirm(`¿Estás seguro de que quieres eliminar "${video.nombre}"?`)) {
@@ -25,37 +27,48 @@ export function VideoCard({ video, onVideoDeleted }: VideoCardProps) {
     }
 
     setDeleting(true)
+    setError("")
 
     try {
       const response = await fetch(`/api/videos/${video.id}`, {
         method: "DELETE",
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || "Error al eliminar")
+        throw new Error(data.error || "Error al eliminar el video")
       }
 
       onVideoDeleted()
-    } catch (err: any) {
-      alert("Error: " + err.message)
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError("Error desconocido")
+      }
     } finally {
       setDeleting(false)
     }
   }
 
   return (
-    <div className="video-card border border-gray-200">
-      <div className="video-thumbnail">
-        <img
+    <div className="video-card border border-gray-200 rounded-lg overflow-hidden">
+      <div className="video-thumbnail relative aspect-video bg-gray-100">
+        <Image
           src={`https://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg`}
           alt={video.nombre}
+          fill
+          priority={false}
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, 33vw"
           onError={(e) => {
-            e.currentTarget.src = `https://img.youtube.com/vi/${video.video_id}/hqdefault.jpg`
+            const target = e.target as HTMLImageElement
+            target.src = `https://img.youtube.com/vi/${video.video_id}/hqdefault.jpg`
           }}
         />
-        <div className="play-overlay">
-          <Play className="w-6 h-6 text-white" fill="white" />
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+          <Play className="w-10 h-10 text-white" fill="white" />
         </div>
       </div>
 
@@ -67,6 +80,12 @@ export function VideoCard({ video, onVideoDeleted }: VideoCardProps) {
           {video.url}
         </p>
 
+        {error && (
+          <div className="mb-3 text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded">
+            {error}
+          </div>
+        )}
+
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -77,6 +96,7 @@ export function VideoCard({ video, onVideoDeleted }: VideoCardProps) {
             <ExternalLink className="w-4 h-4 mr-1" />
             Ver
           </Button>
+
           <Button
             variant="outline"
             size="sm"

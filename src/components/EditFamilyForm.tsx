@@ -49,8 +49,8 @@ export function EditFamilyForm({ familyName, familySlug }: EditFamilyFormProps) 
       setTimeout(() => {
         window.location.reload()
       }, 1500)
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido')
     } finally {
       setLoading(false)
     }
