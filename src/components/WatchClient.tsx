@@ -12,24 +12,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-// Declaración global correcta de YouTube API
 declare global {
   interface Window {
-    YT: {
-      Player: new (elementId: string, config: {
-        height: string
-        width: string
-        videoId: string
-        playerVars?: Record<string, unknown>
-        events?: {
-          onStateChange?: (event: { data: number; target: unknown }) => void
+    YT?: {
+      Player: {
+        new (elementId: string, config: unknown): {
+          destroy?: () => void
+          loadVideoById?: (videoId: string) => void
         }
-      }) => {
-        destroy?: () => void
-        loadVideoById?: (videoId: string) => void
       }
     }
-    onYouTubeIframeAPIReady: () => void
+    onYouTubeIframeAPIReady?: () => void
   }
 }
 
@@ -54,7 +47,10 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [visibleCount, setVisibleCount] = useState(10)
 
-  const playerRef = useRef<ReturnType<typeof window.YT.Player> | null>(null)
+  const playerRef = useRef<{
+    destroy?: () => void
+    loadVideoById?: (videoId: string) => void
+  } | null>(null)
   const videoContainerRef = useRef<HTMLDivElement>(null)
   const sessionIdRef = useRef<number | null>(null)
   const startTimeRef = useRef<number | null>(null)
@@ -67,6 +63,24 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
 
   useEffect(() => {
     if (displayedVideos.length === 0) return
+
+    function onPlayerStateChange(event: { data: number }) {
+      if (displayedVideos.length === 0) return
+      const video = displayedVideos[currentIndex]
+
+      if (event.data === 1) {
+        if (!isTrackingRef.current) {
+          startWatchSession(video)
+        } else {
+          resumeTracking()
+        }
+      } else if (event.data === 2) {
+        pauseTracking()
+      } else if (event.data === 0) {
+        endWatchSession(true)
+        setTimeout(() => playNextVideo(), 1000)
+      }
+    }
 
     function initPlayer() {
       if (displayedVideos.length === 0 || !window.YT) return
@@ -107,7 +121,7 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
         playerRef.current.destroy()
       }
     }
-  }, [displayedVideos])
+  }, [displayedVideos, currentIndex])
 
   function shuffleArray(array: Video[]) {
     const shuffled = [...array]
@@ -183,24 +197,6 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
       isTrackingRef.current = false
     } catch (error) {
       console.error("Error ending session:", error)
-    }
-  }
-
-  function onPlayerStateChange(event: { data: number }) {
-    if (displayedVideos.length === 0) return
-    const video = displayedVideos[currentIndex]
-
-    if (event.data === 1) {
-      if (!isTrackingRef.current) {
-        startWatchSession(video)
-      } else {
-        resumeTracking()
-      }
-    } else if (event.data === 2) {
-      pauseTracking()
-    } else if (event.data === 0) {
-      endWatchSession(true)
-      setTimeout(() => playNextVideo(), 1000)
     }
   }
 
