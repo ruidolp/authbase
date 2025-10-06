@@ -24,6 +24,12 @@ interface WatchClientProps {
   initialVideos: Video[]
 }
 
+declare global {
+  interface Window {
+    onYouTubeIframeAPIReady: () => void
+  }
+}
+
 export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
   const { data: session } = useSession()
   const [videos] = useState<Video[]>(initialVideos)
@@ -56,9 +62,8 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
     }
 
     return () => {
-      if (playerRef.current?.destroy) {
-        playerRef.current.destroy()
-      }
+      if (playerRef.current?.destroy) playerRef.current.destroy()
+      delete (window as any).onYouTubeIframeAPIReady
     }
   }, [displayedVideos])
 
