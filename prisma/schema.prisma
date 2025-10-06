@@ -8,35 +8,6 @@ datasource db {
 }
 
 // ============================================
-// TABLAS EXISTENTES (Videos)
-// ============================================
-
-model videos {
-  id         Int       @id @default(autoincrement())
-  video_id   String    @unique
-  nombre     String
-  url        String
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-}
-
-model watch_sessions {
-  id              Int       @id @default(autoincrement())
-  video_id        String
-  video_nombre    String
-  started_at      DateTime  @default(now()) @db.Timestamp(6)
-  ended_at        DateTime? @db.Timestamp(6)
-  seconds_watched Int?      @default(0)
-  watch_date      DateTime  @default(dbgenerated("CURRENT_DATE")) @db.Date
-  completed       Boolean?  @default(false)
-  created_at      DateTime? @default(now()) @db.Timestamp(6)
-
-  @@index([created_at(sort: Desc)], map: "idx_created_at")
-  @@index([video_id], map: "idx_video_id")
-  @@index([watch_date], map: "idx_watch_date")
-  @@index([watch_date, video_id], map: "idx_watch_date_video")
-}
-
-// ============================================
 // TABLAS DE AUTH (NextAuth)
 // ============================================
 
@@ -46,17 +17,26 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   image         String?
-  accounts      Account[]
-  sessions      Session[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  
+  familyId      String?   @map("family_id")
+  family        Family?   @relation(fields: [familyId], references: [id], onDelete: SetNull)
+  role          String?   // "owner" o "admin"
+  
+  accounts         Account[]
+  sessions         Session[]
+  sentInvitations  FamilyInvitation[]  // ← AGREGADO
+  
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at")
+  
+  @@map("User")
 }
 
 model Account {
-  userId            String
+  userId            String   @map("userId")
   type              String
   provider          String
-  providerAccountId String
+  providerAccountId String   @map("providerAccountId")
   refresh_token     String?
   access_token      String?
   expires_at        Int?
@@ -64,21 +44,24 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt         DateTime @default(now()) @map("createdAt")
+  updatedAt         DateTime @default(now()) @updatedAt @map("updatedAt")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([provider, providerAccountId])
+  @@map("Account")
 }
 
 model Session {
-  sessionToken String   @unique
-  userId       String
+  sessionToken String   @unique @map("sessionToken")
+  userId       String   @map("userId")
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime @default(now()) @map("createdAt")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updatedAt")
+  
+  @@map("Session")
 }
 
 model VerificationToken {
@@ -87,4 +70,85 @@ model VerificationToken {
   expires    DateTime
 
   @@id([identifier, token])
+  @@map("VerificationToken")
+}
+
+// ============================================
+// TABLAS DE FAMILIA
+// ============================================
+
+model Family {
+  id                 String    @id @default(cuid())
+  name               String
+  slug               String    @unique
+  createdBy          String    @map("created_by")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  lastSlugChangeDate DateTime? @map("last_slug_change_date")  // ← MANTENIDO
+  slugChangesToday   Int       @default(0) @map("slug_changes_today")  // ← MANTENIDO
+  
+  users       User[]
+  videos      Video[]
+  invitations FamilyInvitation[]
+  
+  @@map("families")
+}
+
+model FamilyInvitation {
+  id           String   @id @default(cuid())
+  familyId     String   @map("family_id")
+  family       Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  
+  invitedEmail String   @map("invited_email")
+  invitedBy    String   @map("invited_by")
+  inviter      User     @relation(fields: [invitedBy], references: [id])  // ← AGREGADO
+  token        String   @unique
+  status       String   @default("pending") // "pending" o "accepted"
+  
+  createdAt    DateTime @default(now()) @map("created_at")
+  
+  @@map("family_invitations")
+}
+
+// ============================================
+// TABLAS DE VIDEOS
+// ============================================
+
+model Video {
+  id        Int      @id @default(autoincrement())
+  video_id  String   @unique @map("video_id")
+  nombre    String
+  url       String
+  
+  familyId  String   @map("family_id")
+  family    Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  
+  watchSessions WatchSession[]
+  
+  @@map("videos")
+}
+
+model WatchSession {
+  id             Int       @id @default(autoincrement())
+  
+  videoId        Int       @map("video_id")
+  video          Video     @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  
+  videoNombre    String    @map("video_nombre")
+  familyId       String    @map("family_id")
+  
+  startedAt      DateTime  @default(now()) @map("started_at") @db.Timestamp(6)
+  endedAt        DateTime? @map("ended_at") @db.Timestamp(6)
+  secondsWatched Int?      @default(0) @map("seconds_watched")
+  watchDate      DateTime  @default(dbgenerated("CURRENT_DATE")) @map("watch_date") @db.Date
+  completed      Boolean?  @default(false)
+  createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+
+  @@index([createdAt(sort: Desc)], map: "idx_created_at")
+  @@index([videoId], map: "idx_video_id")
+  @@index([watchDate], map: "idx_watch_date")
+  @@index([watchDate, videoId], map: "idx_watch_date_video")
+  @@index([familyId], map: "idx_family_id")
+  @@map("watch_sessions")
 }
