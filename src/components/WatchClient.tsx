@@ -12,6 +12,27 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+// Declaración global correcta de YouTube API
+declare global {
+  interface Window {
+    YT: {
+      Player: new (elementId: string, config: {
+        height: string
+        width: string
+        videoId: string
+        playerVars?: Record<string, unknown>
+        events?: {
+          onStateChange?: (event: { data: number; target: unknown }) => void
+        }
+      }) => {
+        destroy?: () => void
+        loadVideoById?: (videoId: string) => void
+      }
+    }
+    onYouTubeIframeAPIReady: () => void
+  }
+}
+
 interface Video {
   id: number
   video_id: string
@@ -25,12 +46,6 @@ interface WatchClientProps {
   initialVideos: Video[]
 }
 
-declare global {
-  interface Window {
-    onYouTubeIframeAPIReady: () => void
-  }
-}
-
 export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
   const { data: session } = useSession()
   const [videos] = useState<Video[]>(initialVideos)
@@ -39,7 +54,7 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [visibleCount, setVisibleCount] = useState(10)
 
-  const playerRef = useRef<YT.Player | null>(null)
+  const playerRef = useRef<ReturnType<typeof window.YT.Player> | null>(null)
   const videoContainerRef = useRef<HTMLDivElement>(null)
   const sessionIdRef = useRef<number | null>(null)
   const startTimeRef = useRef<number | null>(null)
@@ -53,7 +68,6 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
   useEffect(() => {
     if (displayedVideos.length === 0) return
 
-    // --- función local: evita warning de deps por "initPlayer" ---
     function initPlayer() {
       if (displayedVideos.length === 0 || !window.YT) return
 
@@ -79,29 +93,19 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
       }
     }
 
-    const SCRIPT_SRC = "https://www.youtube.com/iframe_api"
-    const existing = document.querySelector(
-      `script[src="${SCRIPT_SRC}"]`
-    ) as HTMLScriptElement | null
+    const tag = document.createElement("script")
+    tag.src = "https://www.youtube.com/iframe_api"
+    const firstScriptTag = document.getElementsByTagName("script")[0]
+    firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag)
 
-    if (existing && window.YT && typeof window.YT.Player === "function") {
+    window.onYouTubeIframeAPIReady = () => {
       initPlayer()
-    } else {
-      if (!existing) {
-        const tag = document.createElement("script")
-        tag.src = SCRIPT_SRC
-        const firstScriptTag = document.getElementsByTagName("script")[0]
-        firstScriptTag?.parentNode?.insertBefore(tag, firstScriptTag || null)
-      }
-      window.onYouTubeIframeAPIReady = () => {
-        initPlayer()
-      }
     }
 
     return () => {
-      if (playerRef.current?.destroy) playerRef.current.destroy()
-      // borrar la propiedad tipada, sin any
-      delete (window as Window & { onYouTubeIframeAPIReady?: () => void }).onYouTubeIframeAPIReady
+      if (playerRef.current?.destroy) {
+        playerRef.current.destroy()
+      }
     }
   }, [displayedVideos])
 
@@ -182,11 +186,10 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
     }
   }
 
-  function onPlayerStateChange(event: YT.OnStateChangeEvent) {
+  function onPlayerStateChange(event: { data: number }) {
     if (displayedVideos.length === 0) return
     const video = displayedVideos[currentIndex]
 
-    // 1 = playing, 2 = paused, 0 = ended
     if (event.data === 1) {
       if (!isTrackingRef.current) {
         startWatchSession(video)
@@ -287,7 +290,6 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-4 py-3">
         <div className="flex items-center justify-between max-w-full">
           <h1 className="text-xl font-bold text-gray-900">MyFTV</h1>
@@ -334,9 +336,7 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
         </div>
       </header>
 
-      {/* Main content */}
       <div className="max-w-full">
-        {/* Video arriba - modo cine */}
         <div ref={videoContainerRef} className="w-full">
           <div className="bg-black overflow-hidden mb-4">
             <div className="relative w-full" style={{ paddingBottom: "45%" }}>
@@ -356,11 +356,9 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
           )}
         </div>
 
-        {/* Abajo: espacio vacío izquierda + sidebar derecha */}
         <div className="flex px-6 pb-6">
           <div className="flex-1"></div>
 
-          {/* Sidebar a la derecha */}
           <div className="w-96 bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
             <div className="bg-gray-50 p-4 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900">Más Videos</h2>
@@ -381,13 +379,14 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
                       : "hover:bg-white"
                   }`}
                 >
-                  <div className="relative w-40 h-24">
+                  <div className="relative w-40 h-24 flex-shrink-0">
                     <Image
                       src={`https://img.youtube.com/vi/${video.video_id}/mqdefault.jpg`}
                       alt={video.nombre}
                       fill
                       className="object-cover rounded"
                       sizes="160px"
+                      unoptimized
                     />
                   </div>
                   <div className="flex-1 min-w-0">
