@@ -207,7 +207,7 @@
 .youtube-blocker-top {
   top: 0;
   left: 0;
-  right: 0;
+  right: 80px; /* Dejar espacio a la derecha para el botón de fullscreen */
   height: 50px;
 }
 
@@ -274,7 +274,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
+  right: 100px; /* Dejar espacio para el botón de fullscreen */
   height: 60px;
 }
 
