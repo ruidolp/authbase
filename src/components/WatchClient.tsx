@@ -24,6 +24,21 @@ declare global {
     }
     onYouTubeIframeAPIReady?: () => void
   }
+
+  interface HTMLElement {
+    webkitRequestFullscreen?: () => Promise<void>
+    mozRequestFullScreen?: () => Promise<void>
+    msRequestFullscreen?: () => Promise<void>
+  }
+
+  interface Document {
+    webkitFullscreenElement?: Element
+    mozFullScreenElement?: Element
+    msFullscreenElement?: Element
+    webkitExitFullscreen?: () => Promise<void>
+    mozCancelFullScreen?: () => Promise<void>
+    msExitFullscreen?: () => Promise<void>
+  }
 }
 
 interface Video {
@@ -302,23 +317,23 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
         // Entrar en fullscreen
         if (videoContainerRef.current.requestFullscreen) {
           await videoContainerRef.current.requestFullscreen()
-        } else if ((videoContainerRef.current as any).webkitRequestFullscreen) {
-          await (videoContainerRef.current as any).webkitRequestFullscreen()
-        } else if ((videoContainerRef.current as any).mozRequestFullScreen) {
-          await (videoContainerRef.current as any).mozRequestFullScreen()
-        } else if ((videoContainerRef.current as any).msRequestFullscreen) {
-          await (videoContainerRef.current as any).msRequestFullscreen()
+        } else if (videoContainerRef.current.webkitRequestFullscreen) {
+          await videoContainerRef.current.webkitRequestFullscreen()
+        } else if (videoContainerRef.current.mozRequestFullScreen) {
+          await videoContainerRef.current.mozRequestFullScreen()
+        } else if (videoContainerRef.current.msRequestFullscreen) {
+          await videoContainerRef.current.msRequestFullscreen()
         }
       } else {
         // Salir de fullscreen
         if (document.exitFullscreen) {
           await document.exitFullscreen()
-        } else if ((document as any).webkitExitFullscreen) {
-          await (document as any).webkitExitFullscreen()
-        } else if ((document as any).mozCancelFullScreen) {
-          await (document as any).mozCancelFullScreen()
-        } else if ((document as any).msExitFullscreen) {
-          await (document as any).msExitFullscreen()
+        } else if (document.webkitExitFullscreen) {
+          await document.webkitExitFullscreen()
+        } else if (document.mozCancelFullScreen) {
+          await document.mozCancelFullScreen()
+        } else if (document.msExitFullscreen) {
+          await document.msExitFullscreen()
         }
       }
     } catch (error) {
@@ -331,9 +346,9 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
     function handleFullscreenChange() {
       const isCurrentlyFullscreen = !!(
         document.fullscreenElement ||
-        (document as any).webkitFullscreenElement ||
-        (document as any).mozFullScreenElement ||
-        (document as any).msFullscreenElement
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
       )
       setIsFullscreen(isCurrentlyFullscreen)
     }
