@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import { Search, User } from "lucide-react"
+import { Search, User, Maximize, Minimize } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
 import {
@@ -56,10 +56,19 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
   const startTimeRef = useRef<number | null>(null)
   const accumulatedSecondsRef = useRef(0)
   const isTrackingRef = useRef(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isIOS, setIsIOS] = useState(false)
 
   useEffect(() => {
     setDisplayedVideos(shuffleArray([...videos]))
   }, [videos])
+
+  // Detectar iOS
+  useEffect(() => {
+    const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    setIsIOS(ios)
+  }, [])
 
   useEffect(() => {
     if (displayedVideos.length === 0) return
@@ -105,7 +114,7 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
             controls: 1,
             rel: 0,
             modestbranding: 1,
-            fs: 1,
+            fs: 0, // Deshabilitar botón de fullscreen de YouTube
             enablejsapi: 1,
             disablekb: 1, // Deshabilitar controles de teclado
             iv_load_policy: 3, // Ocultar anotaciones
@@ -284,6 +293,64 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
     setVisibleCount((prev) => prev + 10)
   }
 
+  // Manejar fullscreen custom
+  async function toggleFullscreen() {
+    if (!videoContainerRef.current) return
+
+    try {
+      if (!isFullscreen) {
+        // Entrar en fullscreen
+        if (videoContainerRef.current.requestFullscreen) {
+          await videoContainerRef.current.requestFullscreen()
+        } else if ((videoContainerRef.current as any).webkitRequestFullscreen) {
+          await (videoContainerRef.current as any).webkitRequestFullscreen()
+        } else if ((videoContainerRef.current as any).mozRequestFullScreen) {
+          await (videoContainerRef.current as any).mozRequestFullScreen()
+        } else if ((videoContainerRef.current as any).msRequestFullscreen) {
+          await (videoContainerRef.current as any).msRequestFullscreen()
+        }
+      } else {
+        // Salir de fullscreen
+        if (document.exitFullscreen) {
+          await document.exitFullscreen()
+        } else if ((document as any).webkitExitFullscreen) {
+          await (document as any).webkitExitFullscreen()
+        } else if ((document as any).mozCancelFullScreen) {
+          await (document as any).mozCancelFullScreen()
+        } else if ((document as any).msExitFullscreen) {
+          await (document as any).msExitFullscreen()
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling fullscreen:', error)
+    }
+  }
+
+  // Detectar cambios de fullscreen
+  useEffect(() => {
+    function handleFullscreenChange() {
+      const isCurrentlyFullscreen = !!(
+        document.fullscreenElement ||
+        (document as any).webkitFullscreenElement ||
+        (document as any).mozFullScreenElement ||
+        (document as any).msFullscreenElement
+      )
+      setIsFullscreen(isCurrentlyFullscreen)
+    }
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange)
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange)
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange)
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange)
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange)
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange)
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange)
+    }
+  }, [])
+
   useEffect(() => {
     const handleBeforeUnload = () => {
       if (isTrackingRef.current && sessionIdRef.current) {
@@ -390,6 +457,20 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
                 onClick={(e) => e.stopPropagation()}
                 onTouchStart={(e) => e.stopPropagation()}
               />
+              {/* Botón de fullscreen custom */}
+              {!isIOS && (
+                <button
+                  onClick={toggleFullscreen}
+                  className="fullscreen-button"
+                  aria-label={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+                >
+                  {isFullscreen ? (
+                    <Minimize className="w-6 h-6" />
+                  ) : (
+                    <Maximize className="w-6 h-6" />
+                  )}
+                </button>
+              )}
             </div>
           </div>
 
