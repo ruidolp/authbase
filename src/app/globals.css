@@ -197,10 +197,13 @@
 /* Estilos para bloquear controles de YouTube en modo normal y fullscreen */
 .youtube-blocker-overlay {
   position: absolute;
-  pointer-events: auto;
+  pointer-events: all !important; /* Forzar captura de todos los eventos */
   z-index: 10;
   background: transparent;
   cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 /* Overlay para bloquear el título en la parte superior */
@@ -208,7 +211,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 50px;
+  height: 80px; /* Aumentado para bloquear mejor el título */
 }
 
 /* Overlay para la barra inferior completa */
@@ -216,29 +219,29 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: 100px; /* Aumentado para bloquear mejor la barra de controles */
 }
 
 /* Overlay adicional para la esquina inferior derecha (logo de YouTube) */
 .youtube-blocker-corner {
   bottom: 0;
   right: 0;
-  width: 120px;
-  height: 80px;
+  width: 180px; /* Aumentado para bloquear mejor el logo y controles */
+  height: 120px;
 }
 
 /* Botón de fullscreen custom */
 .fullscreen-button {
   position: absolute;
   top: 50%;
-  right: 12px;
+  right: 20px;
   transform: translateY(-50%);
   z-index: 20;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.7);
   color: white;
   border: none;
-  border-radius: 4px;
-  padding: 8px;
+  border-radius: 6px;
+  padding: 10px;
   cursor: pointer;
   transition: opacity 0.3s ease, background 0.2s ease;
   pointer-events: auto;
@@ -246,7 +249,7 @@
 }
 
 .fullscreen-button:hover {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.9);
 }
 
 .fullscreen-button.visible {
@@ -257,6 +260,24 @@
 .fullscreen-button.hidden {
   opacity: 0;
   pointer-events: none;
+}
+
+/* En desktop (pantalla grande), ocultar el botón por defecto en modo normal */
+@media (min-width: 1024px) {
+  .fullscreen-button {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  /* Mostrar el botón cuando el mouse está sobre el contenedor del video */
+  .w-full:hover .fullscreen-button {
+    opacity: 1;
+  }
+
+  /* Siempre mostrar el botón cuando se usa la clase visible */
+  .fullscreen-button.visible {
+    opacity: 1 !important;
+  }
 }
 
 /* Estilos para fullscreen - aplicar a todos los elementos con fullscreen */
@@ -276,7 +297,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: 120px; /* Aumentado para bloquear mejor el título */
 }
 
 :fullscreen .youtube-blocker-bottom,
@@ -287,7 +308,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 80px;
+  height: 120px; /* Aumentado para bloquear mejor la barra de controles en fullscreen */
 }
 
 :fullscreen .youtube-blocker-corner,
@@ -297,8 +318,8 @@
   position: fixed;
   bottom: 0;
   right: 0;
-  width: 150px;
-  height: 100px;
+  width: 200px; /* Aumentado para bloquear mejor el logo y controles en fullscreen */
+  height: 140px;
 }
 
 /* Estilo del botón de fullscreen en modo fullscreen */
@@ -308,9 +329,10 @@
 :-ms-fullscreen .fullscreen-button {
   position: fixed;
   top: 50%;
-  right: 20px;
+  right: 24px;
   transform: translateY(-50%);
   z-index: 2147483647;
+  opacity: 1; /* Siempre visible en fullscreen cuando showControls está activo */
 }
 
 /* Ajustar el contenedor de video en fullscreen */
@@ -382,21 +404,21 @@
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  height: 60px !important;
+  height: 120px !important; /* Aumentado para bloquear mejor el título en vertical */
 }
 
 .pseudo-fullscreen[data-orientation="portrait"] .youtube-blocker-bottom {
   bottom: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  height: 80px !important;
+  height: 140px !important; /* Aumentado para bloquear mejor en portrait */
 }
 
 .pseudo-fullscreen[data-orientation="portrait"] .youtube-blocker-corner {
   bottom: 0 !important;
   right: 0 !important;
-  width: 150px !important;
-  height: 100px !important;
+  width: 220px !important; /* Aumentado para bloquear mejor en portrait */
+  height: 160px !important;
 }
 
 /* Ajustes para orientación LANDSCAPE (horizontal) */
@@ -404,39 +426,40 @@
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  height: 50px !important;
+  height: 100px !important; /* Aumentado para bloquear mejor en landscape */
 }
 
 .pseudo-fullscreen[data-orientation="landscape"] .youtube-blocker-bottom {
   bottom: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  height: 60px !important;
+  height: 100px !important; /* Aumentado para bloquear mejor en landscape */
 }
 
 .pseudo-fullscreen[data-orientation="landscape"] .youtube-blocker-corner {
   bottom: 0 !important;
   right: 0 !important;
-  width: 120px !important;
-  height: 80px !important;
+  width: 180px !important; /* Aumentado para bloquear mejor en landscape */
+  height: 120px !important;
 }
 
 /* Botón de fullscreen en pseudo-fullscreen */
 .pseudo-fullscreen .fullscreen-button {
   position: absolute !important;
   z-index: 10001 !important;
+  opacity: 1 !important; /* Siempre visible en pseudo-fullscreen */
 }
 
-/* Posición del botón en portrait: al medio derecha */
+/* Posición del botón en portrait: al medio derecha (igual que desktop) */
 .pseudo-fullscreen[data-orientation="portrait"] .fullscreen-button {
   top: 50% !important;
-  right: 20px !important;
+  right: 24px !important;
   transform: translateY(-50%) !important;
 }
 
-/* Posición del botón en landscape: esquina superior derecha */
+/* Posición del botón en landscape: al medio derecha (consistente) */
 .pseudo-fullscreen[data-orientation="landscape"] .fullscreen-button {
-  top: 20px !important;
-  right: 20px !important;
-  transform: none !important;
+  top: 50% !important;
+  right: 24px !important;
+  transform: translateY(-50%) !important;
 }
