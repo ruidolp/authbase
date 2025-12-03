@@ -73,6 +73,8 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
   const isTrackingRef = useRef(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
+  const [showControls, setShowControls] = useState(true)
+  const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     setDisplayedVideos(shuffleArray([...videos]))
@@ -351,6 +353,11 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
         document.msFullscreenElement
       )
       setIsFullscreen(isCurrentlyFullscreen)
+
+      // Mostrar controles al entrar/salir de fullscreen
+      if (isCurrentlyFullscreen) {
+        setShowControls(true)
+      }
     }
 
     document.addEventListener('fullscreenchange', handleFullscreenChange)
@@ -365,6 +372,58 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
       document.removeEventListener('MSFullscreenChange', handleFullscreenChange)
     }
   }, [])
+
+  // Auto-hide de controles en fullscreen
+  useEffect(() => {
+    if (!isFullscreen) {
+      setShowControls(true)
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current)
+      }
+      return
+    }
+
+    // Función para mostrar controles y resetear timer
+    const showControlsTemporarily = () => {
+      setShowControls(true)
+
+      // Limpiar timeout anterior
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current)
+      }
+
+      // Ocultar después de 3 segundos
+      controlsTimeoutRef.current = setTimeout(() => {
+        setShowControls(false)
+      }, 3000)
+    }
+
+    // Mostrar controles al entrar en fullscreen
+    showControlsTemporarily()
+
+    // Event listeners para mostrar controles
+    const handleInteraction = () => {
+      showControlsTemporarily()
+    }
+
+    const container = videoContainerRef.current
+    if (container) {
+      container.addEventListener('mousemove', handleInteraction)
+      container.addEventListener('touchstart', handleInteraction)
+      container.addEventListener('click', handleInteraction)
+    }
+
+    return () => {
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current)
+      }
+      if (container) {
+        container.removeEventListener('mousemove', handleInteraction)
+        container.removeEventListener('touchstart', handleInteraction)
+        container.removeEventListener('click', handleInteraction)
+      }
+    }
+  }, [isFullscreen])
 
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -460,6 +519,12 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
                 id="player"
                 className="absolute top-0 left-0 w-full h-full"
               ></div>
+              {/* Overlay para bloquear el título en la parte superior */}
+              <div
+                className="youtube-blocker-overlay youtube-blocker-top"
+                onClick={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
+              />
               {/* Overlay para bloquear la barra inferior de YouTube */}
               <div
                 className="youtube-blocker-overlay youtube-blocker-bottom"
@@ -473,19 +538,17 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
                 onTouchStart={(e) => e.stopPropagation()}
               />
               {/* Botón de fullscreen custom */}
-              {!isIOS && (
-                <button
-                  onClick={toggleFullscreen}
-                  className="fullscreen-button"
-                  aria-label={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
-                >
-                  {isFullscreen ? (
-                    <Minimize className="w-6 h-6" />
-                  ) : (
-                    <Maximize className="w-6 h-6" />
-                  )}
-                </button>
-              )}
+              <button
+                onClick={toggleFullscreen}
+                className={`fullscreen-button ${showControls ? 'visible' : 'hidden'}`}
+                aria-label={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+              >
+                {isFullscreen ? (
+                  <Minimize className="w-6 h-6" />
+                ) : (
+                  <Maximize className="w-6 h-6" />
+                )}
+              </button>
             </div>
           </div>
 

@@ -203,6 +203,14 @@
   cursor: default;
 }
 
+/* Overlay para bloquear el título en la parte superior */
+.youtube-blocker-top {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+}
+
 /* Overlay para la barra inferior completa */
 .youtube-blocker-bottom {
   bottom: 0;
@@ -231,12 +239,23 @@
   border-radius: 4px;
   padding: 8px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: opacity 0.3s ease, background 0.2s ease;
   pointer-events: auto;
+  opacity: 1;
 }
 
 .fullscreen-button:hover {
   background: rgba(0, 0, 0, 0.8);
+}
+
+.fullscreen-button.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.fullscreen-button.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Estilos para fullscreen - aplicar a todos los elementos con fullscreen */
@@ -248,6 +267,17 @@
 }
 
 /* Asegurar que los overlays se mantengan visibles en fullscreen */
+:fullscreen .youtube-blocker-top,
+:-webkit-full-screen .youtube-blocker-top,
+:-moz-full-screen .youtube-blocker-top,
+:-ms-fullscreen .youtube-blocker-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+}
+
 :fullscreen .youtube-blocker-bottom,
 :-webkit-full-screen .youtube-blocker-bottom,
 :-moz-full-screen .youtube-blocker-bottom,
