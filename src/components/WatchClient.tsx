@@ -107,6 +107,9 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
             modestbranding: 1,
             fs: 1,
             enablejsapi: 1,
+            disablekb: 1, // Deshabilitar controles de teclado
+            iv_load_policy: 3, // Ocultar anotaciones
+            playsinline: 1, // Reproducir inline en iOS
           },
           events: {
             onReady: () => {
@@ -375,6 +378,18 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
                 id="player"
                 className="absolute top-0 left-0 w-full h-full"
               ></div>
+              {/* Overlay para bloquear la barra inferior de YouTube */}
+              <div
+                className="youtube-blocker-overlay youtube-blocker-bottom"
+                onClick={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
+              />
+              {/* Overlay adicional para la esquina inferior derecha donde suele estar el logo */}
+              <div
+                className="youtube-blocker-overlay youtube-blocker-corner"
+                onClick={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
+              />
             </div>
           </div>
 

@@ -193,3 +193,59 @@
 .notification.show {
   transform: translateX(0);
 }
+
+/* Estilos para bloquear controles de YouTube en modo normal y fullscreen */
+.youtube-blocker-overlay {
+  position: absolute;
+  pointer-events: auto;
+  z-index: 10;
+  background: transparent;
+  cursor: default;
+}
+
+/* Overlay para la barra inferior completa */
+.youtube-blocker-bottom {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+}
+
+/* Overlay adicional para la esquina inferior derecha (logo de YouTube) */
+.youtube-blocker-corner {
+  bottom: 0;
+  right: 0;
+  width: 120px;
+  height: 80px;
+}
+
+/* Estilos para fullscreen - aplicar a todos los elementos con fullscreen */
+:fullscreen .youtube-blocker-overlay,
+:-webkit-full-screen .youtube-blocker-overlay,
+:-moz-full-screen .youtube-blocker-overlay,
+:-ms-fullscreen .youtube-blocker-overlay {
+  z-index: 2147483647 !important; /* Máximo z-index posible */
+}
+
+/* Asegurar que los overlays se mantengan visibles en fullscreen */
+:fullscreen .youtube-blocker-bottom,
+:-webkit-full-screen .youtube-blocker-bottom,
+:-moz-full-screen .youtube-blocker-bottom,
+:-ms-fullscreen .youtube-blocker-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+}
+
+:fullscreen .youtube-blocker-corner,
+:-webkit-full-screen .youtube-blocker-corner,
+:-moz-full-screen .youtube-blocker-corner,
+:-ms-fullscreen .youtube-blocker-corner {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 150px;
+  height: 100px;
+}
