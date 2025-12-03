@@ -207,7 +207,7 @@
 .youtube-blocker-top {
   top: 0;
   left: 0;
-  right: 80px; /* Dejar espacio a la derecha para el botón de fullscreen */
+  right: 0;
   height: 50px;
 }
 
@@ -230,8 +230,9 @@
 /* Botón de fullscreen custom */
 .fullscreen-button {
   position: absolute;
-  top: 12px;
+  top: 50%;
   right: 12px;
+  transform: translateY(-50%);
   z-index: 20;
   background: rgba(0, 0, 0, 0.6);
   color: white;
@@ -274,7 +275,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  right: 100px; /* Dejar espacio para el botón de fullscreen */
+  right: 0;
   height: 60px;
 }
 
@@ -306,8 +307,9 @@
 :-moz-full-screen .fullscreen-button,
 :-ms-fullscreen .fullscreen-button {
   position: fixed;
-  top: 20px;
+  top: 50%;
   right: 20px;
+  transform: translateY(-50%);
   z-index: 2147483647;
 }
 
