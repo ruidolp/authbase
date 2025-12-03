@@ -316,26 +316,43 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
 
     try {
       if (!isFullscreen) {
-        // Entrar en fullscreen
-        if (videoContainerRef.current.requestFullscreen) {
-          await videoContainerRef.current.requestFullscreen()
-        } else if (videoContainerRef.current.webkitRequestFullscreen) {
-          await videoContainerRef.current.webkitRequestFullscreen()
-        } else if (videoContainerRef.current.mozRequestFullScreen) {
-          await videoContainerRef.current.mozRequestFullScreen()
-        } else if (videoContainerRef.current.msRequestFullscreen) {
-          await videoContainerRef.current.msRequestFullscreen()
+        if (isIOS) {
+          // iOS: Usar pseudo-fullscreen con CSS
+          const isLandscape = window.innerWidth > window.innerHeight
+          videoContainerRef.current.setAttribute('data-orientation', isLandscape ? 'landscape' : 'portrait')
+          videoContainerRef.current.classList.add('pseudo-fullscreen')
+          setIsFullscreen(true)
+          document.body.style.overflow = 'hidden'
+        } else {
+          // Android/Desktop: Fullscreen API nativa
+          if (videoContainerRef.current.requestFullscreen) {
+            await videoContainerRef.current.requestFullscreen()
+          } else if (videoContainerRef.current.webkitRequestFullscreen) {
+            await videoContainerRef.current.webkitRequestFullscreen()
+          } else if (videoContainerRef.current.mozRequestFullScreen) {
+            await videoContainerRef.current.mozRequestFullScreen()
+          } else if (videoContainerRef.current.msRequestFullscreen) {
+            await videoContainerRef.current.msRequestFullscreen()
+          }
         }
       } else {
-        // Salir de fullscreen
-        if (document.exitFullscreen) {
-          await document.exitFullscreen()
-        } else if (document.webkitExitFullscreen) {
-          await document.webkitExitFullscreen()
-        } else if (document.mozCancelFullScreen) {
-          await document.mozCancelFullScreen()
-        } else if (document.msExitFullscreen) {
-          await document.msExitFullscreen()
+        if (isIOS) {
+          // iOS: Salir de pseudo-fullscreen
+          videoContainerRef.current.classList.remove('pseudo-fullscreen')
+          videoContainerRef.current.removeAttribute('data-orientation')
+          setIsFullscreen(false)
+          document.body.style.overflow = ''
+        } else {
+          // Android/Desktop: Salir de fullscreen nativo
+          if (document.exitFullscreen) {
+            await document.exitFullscreen()
+          } else if (document.webkitExitFullscreen) {
+            await document.webkitExitFullscreen()
+          } else if (document.mozCancelFullScreen) {
+            await document.mozCancelFullScreen()
+          } else if (document.msExitFullscreen) {
+            await document.msExitFullscreen()
+          }
         }
       }
     } catch (error) {
@@ -343,8 +360,10 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
     }
   }
 
-  // Detectar cambios de fullscreen
+  // Detectar cambios de fullscreen (solo para Android/Desktop, no iOS)
   useEffect(() => {
+    if (isIOS) return // iOS usa pseudo-fullscreen, no necesita estos listeners
+
     function handleFullscreenChange() {
       const isCurrentlyFullscreen = !!(
         document.fullscreenElement ||
@@ -371,7 +390,28 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
       document.removeEventListener('mozfullscreenchange', handleFullscreenChange)
       document.removeEventListener('MSFullscreenChange', handleFullscreenChange)
     }
-  }, [])
+  }, [isIOS])
+
+  // Detectar cambios de orientación en iOS durante pseudo-fullscreen
+  useEffect(() => {
+    if (!isIOS) return
+
+    const handleOrientationChange = () => {
+      if (isFullscreen && videoContainerRef.current) {
+        // Actualizar orientación cuando el usuario rota el dispositivo
+        const isLandscape = window.innerWidth > window.innerHeight
+        videoContainerRef.current.setAttribute('data-orientation', isLandscape ? 'landscape' : 'portrait')
+      }
+    }
+
+    window.addEventListener('orientationchange', handleOrientationChange)
+    window.addEventListener('resize', handleOrientationChange)
+
+    return () => {
+      window.removeEventListener('orientationchange', handleOrientationChange)
+      window.removeEventListener('resize', handleOrientationChange)
+    }
+  }, [isIOS, isFullscreen])
 
   // Auto-hide de controles en fullscreen
   useEffect(() => {
