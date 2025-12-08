@@ -310,6 +310,23 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
     setVisibleCount((prev) => prev + 10)
   }
 
+  // Función para mostrar controles temporalmente
+  function handleShowControls() {
+    if (!isFullscreen) return // Solo en fullscreen
+
+    setShowControls(true)
+
+    // Limpiar timeout anterior
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current)
+    }
+
+    // Ocultar después de 3 segundos
+    controlsTimeoutRef.current = setTimeout(() => {
+      setShowControls(false)
+    }, 3000)
+  }
+
   // Manejar fullscreen custom
   async function toggleFullscreen() {
     if (!videoContainerRef.current) return
@@ -563,20 +580,20 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
               {/* Overlay para bloquear el título en la parte superior */}
               <div
                 className="youtube-blocker-overlay youtube-blocker-top"
-                onClick={(e) => e.stopPropagation()}
-                onTouchStart={(e) => e.stopPropagation()}
+                onClick={(e) => { e.stopPropagation(); handleShowControls(); }}
+                onTouchStart={(e) => { e.stopPropagation(); handleShowControls(); }}
               />
               {/* Overlay para bloquear la barra inferior de YouTube */}
               <div
                 className="youtube-blocker-overlay youtube-blocker-bottom"
-                onClick={(e) => e.stopPropagation()}
-                onTouchStart={(e) => e.stopPropagation()}
+                onClick={(e) => { e.stopPropagation(); handleShowControls(); }}
+                onTouchStart={(e) => { e.stopPropagation(); handleShowControls(); }}
               />
               {/* Overlay adicional para la esquina inferior derecha donde suele estar el logo */}
               <div
                 className="youtube-blocker-overlay youtube-blocker-corner"
-                onClick={(e) => e.stopPropagation()}
-                onTouchStart={(e) => e.stopPropagation()}
+                onClick={(e) => { e.stopPropagation(); handleShowControls(); }}
+                onTouchStart={(e) => { e.stopPropagation(); handleShowControls(); }}
               />
               {/* Botón de fullscreen custom */}
               <button
