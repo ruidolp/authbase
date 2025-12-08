@@ -109,10 +109,9 @@ export function InviteClient({ invitation, session }: InviteClientProps) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="surface-card p-8 max-w-md w-full">
-          <h1 className="text-2xl font-bold mb-4">Invitación a Familia</h1>
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="surface-card p-8 max-w-md w-full">
+        <h1 className="text-2xl font-bold mb-4">Invitación a Familia</h1>
 
         <div className="mb-6">
           <p className="text-gray-600 mb-2">
