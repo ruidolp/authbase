@@ -561,12 +561,11 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
             <Image
               src="/icon_camisol.png"
               alt="Camisol TV"
-              width={32}
-              height={32}
-              className="w-7 h-7 sm:w-8 sm:h-8 rounded-md shadow-[0_4px_14px_rgba(255,47,140,0.25)]"
+              width={180}
+              height={72}
+              className="h-10 sm:h-12 w-auto object-contain drop-shadow-[0_6px_18px_rgba(255,47,140,0.28)]"
               priority
             />
-            <h1 className="text-sm sm:text-base md:text-xl font-bold text-gray-900 whitespace-nowrap">CAMISOL TV</h1>
           </div>
 
           <form onSubmit={handleSearch} className="flex-1 min-w-0 max-w-2xl">
