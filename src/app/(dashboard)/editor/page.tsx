@@ -16,7 +16,6 @@ interface Video {
 export default function EditorPage() {
   const [videos, setVideos] = useState<Video[]>([])
   const [loading, setLoading] = useState(true)
-  const [lastUpdate, setLastUpdate] = useState(new Date())
 
   async function loadVideos() {
     try {
@@ -29,7 +28,6 @@ export default function EditorPage() {
       
       const data = await response.json()
       setVideos(data.videos || data)
-      setLastUpdate(new Date())
     } catch (error) {
       console.error("Error:", error)
     } finally {
@@ -38,17 +36,25 @@ export default function EditorPage() {
   }
 
   useEffect(() => {
+    const headerEl = document.getElementById("page-header")
+    if (headerEl) {
+      headerEl.innerHTML = '<h1 class="text-lg md:text-xl font-semibold">Editor</h1>'
+    }
+
     loadVideos()
+
+    return () => {
+      if (headerEl) {
+        headerEl.innerHTML = ""
+      }
+    }
   }, [])
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold mb-2">Editor</h1>
-        <p className="text-sm md:text-base text-gray-600">Gestiona tu colección de videos seguros</p>
-      </div>
+      <p className="text-sm md:text-base text-gray-600 mb-4">Gestiona tu colección de videos seguros</p>
 
-      <StatsCards totalVideos={videos.length} lastUpdate={lastUpdate} />
+      <StatsCards totalVideos={videos.length} />
 
       <VideoForm onVideoAdded={loadVideos} />
 

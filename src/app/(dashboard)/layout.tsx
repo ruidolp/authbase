@@ -41,6 +41,9 @@ export default async function DashboardLayout({
       <SidebarInset>
         <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
           <SidebarTrigger className="-ml-1" />
+          <span className="text-sm text-muted-foreground flex items-center gap-2">
+            Hola {session?.user?.name || 'amigo'} <span aria-hidden="true">👋</span>
+          </span>
           <Separator orientation="vertical" className="h-6" />
           <div id="page-header" className="flex-1">
             {/* Los títulos de página se inyectarán aquí */}

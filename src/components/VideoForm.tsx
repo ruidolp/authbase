@@ -99,7 +99,7 @@ export function VideoForm({ onVideoAdded }: VideoFormProps) {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full bg-gray-900 hover:bg-gray-800 text-white text-sm md:text-base"
+          className="w-full bg-gray-900 hover:bg-gray-800 text-white text-sm md:text-base py-3 md:py-4"
         >
           {loading ? "Guardando..." : "Guardar Video"}
         </Button>

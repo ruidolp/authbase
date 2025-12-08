@@ -1,7 +1,6 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
-import Image from "next/image"
 import Link from "next/link"
 import { ShareLinkCard } from "@/components/ShareLinkCard"
 import { FamilyInfo } from "@/components/FamilyInfo"
@@ -30,40 +29,6 @@ export default async function DashboardPage() {
     <>
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">Dashboard</h1>
-          <p className="text-sm md:text-base text-gray-600">Bienvenido a MyFTV</p>
-        </div>
-
-        <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 mb-6">
-          {/* Perfil */}
-          <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6">
-            <h2 className="text-lg font-semibold mb-4">Tu Perfil</h2>
-            <div className="space-y-3">
-              {session.user?.image && (
-                <Image 
-                  src={session.user.image} 
-                  alt="Profile" 
-                  width={64}
-                  height={64}
-                  className="rounded-full"
-                  unoptimized
-                />
-              )}
-              <div>
-                <p className="text-sm text-gray-500">Nombre</p>
-                <p className="font-medium">{session.user?.name || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Email</p>
-                <p className="font-medium">{session.user?.email || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Rol</p>
-                <p className="font-medium capitalize">{user.role || 'N/A'}</p>
-              </div>
-            </div>
-          </div>
-
           {/* Familia con edición */}
           <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6">
             <h2 className="text-lg font-semibold mb-4">Información</h2>

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { ExternalLink, Trash2, Play } from "lucide-react"
+import { Trash2, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface Video {
@@ -54,7 +54,7 @@ export function VideoCard({ video, onVideoDeleted }: VideoCardProps) {
 
   return (
     <div className="video-card border border-gray-200 rounded-lg overflow-hidden w-full">
-      <div className="video-thumbnail relative aspect-video bg-gray-100 w-full">
+      <div className="video-thumbnail relative w-full h-36 md:h-40 bg-gray-100">
         <Image
           src={`https://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg`}
           alt={video.nombre}
@@ -86,28 +86,14 @@ export function VideoCard({ video, onVideoDeleted }: VideoCardProps) {
           </div>
         )}
 
-        <div className="flex gap-2 flex-col sm:flex-row">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1 border-gray-300 hover:bg-gray-50 text-xs md:text-sm"
-            onClick={() => window.open(video.url, "_blank")}
-          >
-            <ExternalLink className="w-3 md:w-4 h-3 md:h-4 mr-1" />
-            Ver
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1 border-gray-300 hover:bg-gray-50 hover:text-red-600 text-xs md:text-sm"
-            onClick={handleDelete}
-            disabled={deleting}
-          >
-            <Trash2 className="w-3 md:w-4 h-3 md:h-4 mr-1" />
-            {deleting ? "..." : "Eliminar"}
-          </Button>
-        </div>
+        <Button
+          className="w-full bg-gray-900 hover:bg-gray-800 text-white text-sm md:text-base py-3 md:py-3.5"
+          onClick={handleDelete}
+          disabled={deleting}
+        >
+          <Trash2 className="w-4 h-4 mr-2" />
+          {deleting ? "..." : "Eliminar"}
+        </Button>
       </div>
     </div>
   )
