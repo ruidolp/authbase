@@ -59,8 +59,8 @@ export function InviteClient({ invitation, session }: InviteClientProps) {
 
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <div className="bg-white p-8 rounded-lg border border-gray-200 max-w-md w-full">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="surface-card p-8 max-w-md w-full">
           <h1 className="text-2xl font-bold mb-4">Invitación a Familia</h1>
 
           <div className="mb-6">
@@ -78,7 +78,7 @@ export function InviteClient({ invitation, session }: InviteClientProps) {
           <div className="space-y-3">
             <button
               onClick={() => signIn("google", { callbackUrl: `/invite/${invitation.token}` })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-3"
+              className="w-full px-4 py-3 border border-pink-200 rounded-lg hover:bg-white/60 flex items-center justify-center gap-3 bg-white/50 backdrop-blur"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -91,7 +91,7 @@ export function InviteClient({ invitation, session }: InviteClientProps) {
 
             <button
               onClick={() => signIn("facebook", { callbackUrl: `/invite/${invitation.token}` })}
-              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-3"
+              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-3 shadow-lg shadow-blue-500/30"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12S0 5.446 0 12.073c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -110,8 +110,9 @@ export function InviteClient({ invitation, session }: InviteClientProps) {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="bg-white p-8 rounded-lg border border-gray-200 max-w-md w-full">
-        <h1 className="text-2xl font-bold mb-4">Invitación a Familia</h1>
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="surface-card p-8 max-w-md w-full">
+          <h1 className="text-2xl font-bold mb-4">Invitación a Familia</h1>
 
         <div className="mb-6">
           <p className="text-gray-600 mb-2">

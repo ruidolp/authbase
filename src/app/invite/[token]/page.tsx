@@ -26,15 +26,15 @@ export default async function InvitePage({ params }: PageProps) {
 
   if (!invitation) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="bg-white p-8 rounded-lg border border-gray-200 max-w-md">
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="surface-card p-8 max-w-md w-full">
           <h1 className="text-2xl font-bold mb-4">Invitación no encontrada</h1>
           <p className="text-gray-600 mb-4">
             Este link de invitación no existe o ya expiró.
           </p>
           <Link 
             href="/login"
-            className="block w-full text-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
+            className="block w-full text-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 shadow-lg shadow-pink-400/30"
           >
             Ir a inicio de sesión
           </Link>
@@ -45,15 +45,15 @@ export default async function InvitePage({ params }: PageProps) {
 
   if (invitation.status === 'accepted') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="bg-white p-8 rounded-lg border border-gray-200 max-w-md">
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="surface-card p-8 max-w-md w-full">
           <h1 className="text-2xl font-bold mb-4">Invitación ya aceptada</h1>
           <p className="text-gray-600 mb-4">
             Esta invitación ya fue aceptada previamente.
           </p>
           <a 
             href="/dashboard"
-            className="block w-full text-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
+            className="block w-full text-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 shadow-lg shadow-pink-400/30"
           >
             Ir al Dashboard
           </a>

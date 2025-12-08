@@ -53,7 +53,7 @@ export function VideoCard({ video, onVideoDeleted }: VideoCardProps) {
   }
 
   return (
-    <div className="video-card border border-gray-200 rounded-lg overflow-hidden w-full">
+    <div className="video-card rounded-xl overflow-hidden w-full backdrop-blur-sm">
       <div className="video-thumbnail relative w-full h-36 md:h-40 bg-gray-100">
         <Image
           src={`https://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg`}

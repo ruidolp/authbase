@@ -30,7 +30,7 @@ export function ShareLinkCard({ slug }: ShareLinkCardProps) {
   if (!url) return null // Mientras carga
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6">
+    <div className="surface-card p-4 md:p-6">
       <h2 className="text-base md:text-lg font-semibold mb-3 md:mb-4">Link para compartir</h2>
       <p className="text-xs md:text-sm text-gray-600 mb-3 md:mb-4">
         Comparte este enlace para que tus hijos puedan ver los videos sin necesidad de iniciar sesión
@@ -41,7 +41,7 @@ export function ShareLinkCard({ slug }: ShareLinkCardProps) {
           type="text"
           value={url}
           readOnly
-          className="flex-1 px-3 md:px-4 py-2 bg-gray-50 border border-gray-200 rounded font-mono text-xs md:text-sm"
+          className="flex-1 px-3 md:px-4 py-2 bg-white/70 border border-pink-100 rounded font-mono text-xs md:text-sm shadow-[0_6px_18px_rgba(255,47,140,0.12)] focus:outline-none focus:border-pink-200"
         />
         <Button
           onClick={copyToClipboard}

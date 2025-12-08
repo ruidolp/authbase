@@ -58,7 +58,7 @@ export function VideoForm({ onVideoAdded }: VideoFormProps) {
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6 mb-6 md:mb-8">
+    <div className="surface-card p-4 md:p-6 mb-6 md:mb-8">
       <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-4">Agregar nuevo video</h2>
 
       <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">

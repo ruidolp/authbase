@@ -30,7 +30,7 @@ export default async function DashboardPage() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
           {/* Familia con edición */}
-          <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6">
+          <div className="surface-card p-4 md:p-6">
             <h2 className="text-lg font-semibold mb-4">Información</h2>
             <FamilyInfo 
               familyName={family.name}
@@ -44,7 +44,7 @@ export default async function DashboardPage() {
 
         {/* Gestión de miembros (solo para owner) */}
         {user.role === 'owner' && (
-          <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6 mt-6">
+          <div className="surface-card p-4 md:p-6 mt-6">
             <h2 className="text-lg font-semibold mb-2">Miembros de la Familia</h2>
             <p className="text-gray-600 mb-4">
               Invita a otros miembros para que puedan gestionar los videos de tu familia

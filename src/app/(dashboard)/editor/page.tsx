@@ -58,8 +58,8 @@ export default function EditorPage() {
 
       <VideoForm onVideoAdded={loadVideos} />
 
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-        <div className="px-4 md:px-6 py-3 md:py-4 border-b bg-gray-50">
+      <div className="surface-card overflow-hidden">
+        <div className="px-4 md:px-6 py-3 md:py-4 border-b border-white/30 bg-white/15 backdrop-blur">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <h2 className="text-base md:text-lg font-semibold text-gray-900">Colección de videos</h2>
             <div className="flex items-center space-x-2">
