@@ -2,20 +2,25 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Film, Users, LogOut } from "lucide-react"
+import { Home, Film, Users, LogOut, Play } from "lucide-react"
 import { signOut } from "next-auth/react"
 
 interface NavigationProps {
   userRole?: string | null
+  familySlug?: string | null
 }
 
-export function Navigation({ userRole }: NavigationProps) {
+export function Navigation({ userRole, familySlug }: NavigationProps) {
   const pathname = usePathname()
 
   const links = [
     { href: "/dashboard", label: "Dashboard", icon: Home },
     { href: "/editor", label: "Editor", icon: Film },
   ]
+
+  if (familySlug) {
+    links.push({ href: `/watch/${familySlug}`, label: "Ver videos", icon: Play })
+  }
 
   if (userRole === 'owner') {
     links.push({ href: "/family", label: "Familia", icon: Users })
