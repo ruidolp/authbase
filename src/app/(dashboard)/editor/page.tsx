@@ -42,10 +42,10 @@ export default function EditorPage() {
   }, [])
 
   return (
-    <div className="p-6">
+    <div>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Editor</h1>
-        <p className="text-gray-600">Gestiona tu colección de videos seguros</p>
+        <h1 className="text-2xl md:text-3xl font-bold mb-2">Editor</h1>
+        <p className="text-sm md:text-base text-gray-600">Gestiona tu colección de videos seguros</p>
       </div>
 
       <StatsCards totalVideos={videos.length} lastUpdate={lastUpdate} />
@@ -53,17 +53,17 @@ export default function EditorPage() {
       <VideoForm onVideoAdded={loadVideos} />
 
       <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-        <div className="px-6 py-4 border-b bg-gray-50">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Colección de videos</h2>
+        <div className="px-4 md:px-6 py-3 md:py-4 border-b bg-gray-50">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+            <h2 className="text-base md:text-lg font-semibold text-gray-900">Colección de videos</h2>
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">Videos:</span>
-              <span className="font-semibold text-gray-900">{videos.length}</span>
+              <span className="text-xs md:text-sm text-gray-600">Videos:</span>
+              <span className="text-sm md:text-base font-semibold text-gray-900">{videos.length}</span>
             </div>
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 md:p-6">
           {loading ? (
             <div className="video-grid">
               <div className="loading-skeleton"></div>

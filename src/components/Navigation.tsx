@@ -55,10 +55,10 @@ export function Navigation({ userRole, familySlug }: NavigationProps) {
 
             return (
               <SidebarMenuItem key={link.href}>
-                <SidebarMenuButton asChild isActive={isActive}>
-                  <Link href={link.href}>
+                <SidebarMenuButton asChild isActive={isActive} size="lg">
+                  <Link href={link.href} className="gap-3 px-4 py-3">
                     <Icon className="w-5 h-5" />
-                    <span>{link.label}</span>
+                    <span className="font-medium">{link.label}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -70,9 +70,9 @@ export function Navigation({ userRole, familySlug }: NavigationProps) {
       <SidebarFooter className="border-t">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={() => signOut({ callbackUrl: '/login' })}>
+            <SidebarMenuButton onClick={() => signOut({ callbackUrl: '/login' })} size="lg" className="gap-3 px-4 py-3">
               <LogOut className="w-5 h-5" />
-              <span>Cerrar sesión</span>
+              <span className="font-medium">Cerrar sesión</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

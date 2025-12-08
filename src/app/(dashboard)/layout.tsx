@@ -42,8 +42,8 @@ export default async function DashboardLayout({
         <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="h-6" />
-          <div className="flex-1">
-            {/* Espacio para breadcrumbs u otros elementos del header */}
+          <div id="page-header" className="flex-1">
+            {/* Los títulos de página se inyectarán aquí */}
           </div>
         </header>
         <main className="flex-1 p-4 md:p-6">

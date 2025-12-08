@@ -53,8 +53,8 @@ export function VideoCard({ video, onVideoDeleted }: VideoCardProps) {
   }
 
   return (
-    <div className="video-card border border-gray-200 rounded-lg overflow-hidden">
-      <div className="video-thumbnail relative aspect-video bg-gray-100">
+    <div className="video-card border border-gray-200 rounded-lg overflow-hidden w-full">
+      <div className="video-thumbnail relative aspect-video bg-gray-100 w-full">
         <Image
           src={`https://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg`}
           alt={video.nombre}
@@ -72,39 +72,39 @@ export function VideoCard({ video, onVideoDeleted }: VideoCardProps) {
         </div>
       </div>
 
-      <div className="p-4">
-        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+      <div className="p-3 md:p-4">
+        <h3 className="text-sm md:text-base font-semibold text-gray-900 mb-2 line-clamp-2">
           {video.nombre}
         </h3>
-        <p className="text-xs text-gray-500 font-mono truncate mb-4">
+        <p className="text-xs text-gray-500 font-mono truncate mb-3 md:mb-4">
           {video.url}
         </p>
 
         {error && (
-          <div className="mb-3 text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded">
+          <div className="mb-2 md:mb-3 text-xs md:text-sm text-red-600 bg-red-50 border border-red-200 px-2 md:px-3 py-1.5 md:py-2 rounded">
             {error}
           </div>
         )}
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-col sm:flex-row">
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 border-gray-300 hover:bg-gray-50"
+            className="flex-1 border-gray-300 hover:bg-gray-50 text-xs md:text-sm"
             onClick={() => window.open(video.url, "_blank")}
           >
-            <ExternalLink className="w-4 h-4 mr-1" />
+            <ExternalLink className="w-3 md:w-4 h-3 md:h-4 mr-1" />
             Ver
           </Button>
 
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 border-gray-300 hover:bg-gray-50 hover:text-red-600"
+            className="flex-1 border-gray-300 hover:bg-gray-50 hover:text-red-600 text-xs md:text-sm"
             onClick={handleDelete}
             disabled={deleting}
           >
-            <Trash2 className="w-4 h-4 mr-1" />
+            <Trash2 className="w-3 md:w-4 h-3 md:h-4 mr-1" />
             {deleting ? "..." : "Eliminar"}
           </Button>
         </div>

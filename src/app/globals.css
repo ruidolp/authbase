@@ -133,8 +133,15 @@
 /* Video Components Styles */
 .video-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .video-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
 }
 
 .video-card {
@@ -181,7 +188,13 @@
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
   border-radius: 8px;
-  height: 320px;
+  height: 280px;
+}
+
+@media (min-width: 640px) {
+  .loading-skeleton {
+    height: 320px;
+  }
 }
 
 @keyframes loading {

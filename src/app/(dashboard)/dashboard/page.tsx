@@ -28,16 +28,15 @@ export default async function DashboardPage() {
 
   return (
     <>
-      
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
-          <p className="text-gray-600">Bienvenido a MyFTV</p>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Dashboard</h1>
+          <p className="text-sm md:text-base text-gray-600">Bienvenido a MyFTV</p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 mb-6">
+        <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 mb-6">
           {/* Perfil */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6">
             <h2 className="text-lg font-semibold mb-4">Tu Perfil</h2>
             <div className="space-y-3">
               {session.user?.image && (
@@ -66,7 +65,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* Familia con edición */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6">
             <h2 className="text-lg font-semibold mb-4">Información</h2>
             <FamilyInfo 
               familyName={family.name}
@@ -80,7 +79,7 @@ export default async function DashboardPage() {
 
         {/* Gestión de miembros (solo para owner) */}
         {user.role === 'owner' && (
-          <div className="bg-white border border-gray-200 rounded-lg p-6 mt-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6 mt-6">
             <h2 className="text-lg font-semibold mb-2">Miembros de la Familia</h2>
             <p className="text-gray-600 mb-4">
               Invita a otros miembros para que puedan gestionar los videos de tu familia

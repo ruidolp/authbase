@@ -123,21 +123,21 @@ export function FamilyClient({ currentUser, members, invitations }: FamilyClient
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Familia</h1>
-          <p className="text-gray-600">Gestiona los miembros de tu familia</p>
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Familia</h1>
+          <p className="text-sm md:text-base text-gray-600">Gestiona los miembros de tu familia</p>
         </div>
 
         {/* Miembros Actuales */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Miembros ({members.length}/2)</h2>
+        <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6 mb-4 md:mb-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+            <h2 className="text-lg md:text-xl font-semibold">Miembros ({members.length}/2)</h2>
             {canInvite && (
               <button
                 onClick={() => setShowInviteModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
+                className="flex items-center gap-2 px-3 md:px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 text-sm md:text-base w-full sm:w-auto justify-center"
               >
                 <UserPlus className="w-4 h-4" />
                 Invitar miembro
@@ -145,35 +145,35 @@ export function FamilyClient({ currentUser, members, invitations }: FamilyClient
             )}
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4">
             {members.map((member) => (
-              <div key={member.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div className="flex items-center gap-4">
+              <div key={member.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 md:p-4 border border-gray-200 rounded-lg">
+                <div className="flex items-center gap-3 md:gap-4 w-full sm:w-auto">
                   {member.image ? (
-                    <Image 
-                      src={member.image} 
-                      alt={member.name || ''} 
-                      width={48}
-                      height={48}
-                      className="rounded-full"
+                    <Image
+                      src={member.image}
+                      alt={member.name || ''}
+                      width={40}
+                      height={40}
+                      className="rounded-full w-10 h-10 md:w-12 md:h-12"
                       unoptimized
                     />
                   ) : (
-                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                      <span className="text-gray-600 font-semibold">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-sm md:text-base text-gray-600 font-semibold">
                         {member.name?.charAt(0) || member.email?.charAt(0) || '?'}
                       </span>
                     </div>
                   )}
-                  
-                  <div>
-                    <p className="font-medium">
+
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm md:text-base font-medium truncate">
                       {member.name || 'Sin nombre'}
                       {member.id === currentUser.id && (
-                        <span className="ml-2 text-sm text-gray-500">(Tú)</span>
+                        <span className="ml-2 text-xs md:text-sm text-gray-500">(Tú)</span>
                       )}
                     </p>
-                    <p className="text-sm text-gray-500">{member.email}</p>
+                    <p className="text-xs md:text-sm text-gray-500 truncate">{member.email}</p>
                     <p className="text-xs text-gray-400 capitalize">{member.role}</p>
                   </div>
                 </div>
@@ -181,7 +181,7 @@ export function FamilyClient({ currentUser, members, invitations }: FamilyClient
                 {isOwner && member.id !== currentUser.id && member.role !== 'owner' && (
                   <button
                     onClick={() => handleRemoveMember(member.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg w-full sm:w-auto justify-center flex sm:justify-start"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -193,14 +193,14 @@ export function FamilyClient({ currentUser, members, invitations }: FamilyClient
 
         {/* Invitaciones Pendientes */}
         {pendingInvitations.length > 0 && (
-          <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-            <h2 className="text-xl font-semibold mb-4">Invitaciones Pendientes</h2>
+          <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6 mb-4 md:mb-6">
+            <h2 className="text-lg md:text-xl font-semibold mb-4">Invitaciones Pendientes</h2>
             <div className="space-y-3">
               {pendingInvitations.map((inv) => (
-                <div key={inv.id} className="flex items-center justify-between p-4 border border-yellow-200 bg-yellow-50 rounded-lg">
-                  <div>
-                    <p className="font-medium">{inv.invitedEmail}</p>
-                    <p className="text-sm text-gray-500">
+                <div key={inv.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 md:p-4 border border-yellow-200 bg-yellow-50 rounded-lg">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm md:text-base font-medium truncate">{inv.invitedEmail}</p>
+                    <p className="text-xs md:text-sm text-gray-500">
                       Enviada {new Date(inv.createdAt).toLocaleDateString('es-ES')}
                     </p>
                   </div>
@@ -209,7 +209,7 @@ export function FamilyClient({ currentUser, members, invitations }: FamilyClient
                       const link = `${window.location.origin}/invite/${inv.token}`
                       navigator.clipboard.writeText(link)
                     }}
-                    className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
+                    className="px-3 py-1.5 text-xs md:text-sm border border-gray-300 rounded hover:bg-gray-50 w-full sm:w-auto whitespace-nowrap"
                   >
                     Copiar link
                   </button>
@@ -221,18 +221,18 @@ export function FamilyClient({ currentUser, members, invitations }: FamilyClient
 
         {/* Invitaciones Aceptadas */}
         {acceptedInvitations.length > 0 && (
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold mb-4">Invitaciones Aceptadas</h2>
+          <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+            <h2 className="text-lg md:text-xl font-semibold mb-4">Invitaciones Aceptadas</h2>
             <div className="space-y-3">
               {acceptedInvitations.map((inv) => (
-                <div key={inv.id} className="flex items-center justify-between p-4 border border-green-200 bg-green-50 rounded-lg">
-                  <div>
-                    <p className="font-medium">{inv.invitedEmail}</p>
-                    <p className="text-sm text-gray-500">
+                <div key={inv.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 md:p-4 border border-green-200 bg-green-50 rounded-lg">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm md:text-base font-medium truncate">{inv.invitedEmail}</p>
+                    <p className="text-xs md:text-sm text-gray-500">
                       Aceptada {new Date(inv.createdAt).toLocaleDateString('es-ES')}
                     </p>
                   </div>
-                  <span className="text-green-600 text-sm font-medium">✓ Aceptada</span>
+                  <span className="text-green-600 text-xs md:text-sm font-medium whitespace-nowrap">✓ Aceptada</span>
                 </div>
               ))}
             </div>
@@ -243,36 +243,36 @@ export function FamilyClient({ currentUser, members, invitations }: FamilyClient
       {/* Modal de Invitar */}
       {showInviteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-xl font-semibold mb-4">Invitar Miembro</h3>
+          <div className="bg-white rounded-lg p-4 md:p-6 max-w-md w-full">
+            <h3 className="text-lg md:text-xl font-semibold mb-4">Invitar Miembro</h3>
             
             <input
               type="email"
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
               placeholder="email@ejemplo.com"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4"
+              className="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg mb-4 text-sm md:text-base"
             />
 
             {error && (
-              <p className="text-red-600 text-sm mb-4">{error}</p>
+              <p className="text-red-600 text-xs md:text-sm mb-4">{error}</p>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => {
                   setShowInviteModal(false)
                   setError("")
                   setInviteEmail("")
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="flex-1 px-3 md:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm md:text-base"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleInvite}
                 disabled={loading}
-                className="flex-1 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50"
+                className="flex-1 px-3 md:px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 text-sm md:text-base"
               >
                 {loading ? "Creando..." : "Crear Invitación"}
               </button>
@@ -284,28 +284,28 @@ export function FamilyClient({ currentUser, members, invitations }: FamilyClient
       {/* Modal de Éxito */}
       {showSuccessModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-xl font-semibold mb-4">✅ Invitación Creada</h3>
-            
-            <p className="text-gray-600 mb-4">
+          <div className="bg-white rounded-lg p-4 md:p-6 max-w-md w-full">
+            <h3 className="text-lg md:text-xl font-semibold mb-4">✅ Invitación Creada</h3>
+
+            <p className="text-sm md:text-base text-gray-600 mb-4">
               Comparte este link con la persona que quieres invitar:
             </p>
 
-            <div className="bg-gray-100 p-3 rounded-lg mb-4 break-all text-sm">
+            <div className="bg-gray-100 p-2 md:p-3 rounded-lg mb-4 break-all text-xs md:text-sm">
               {`${window.location.origin}/invite/${inviteToken}`}
             </div>
 
-            <div className="flex gap-3 mb-4">
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
               <button
                 onClick={copyInviteLink}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="flex-1 flex items-center justify-center gap-2 px-3 md:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm md:text-base"
               >
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 {copied ? "¡Copiado!" : "Copiar Link"}
               </button>
               <button
                 onClick={sendWhatsApp}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                className="flex-1 px-3 md:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm md:text-base"
               >
                 Enviar por WhatsApp
               </button>
@@ -316,7 +316,7 @@ export function FamilyClient({ currentUser, members, invitations }: FamilyClient
                 setShowSuccessModal(false)
                 setInviteToken("")
               }}
-              className="w-full px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
+              className="w-full px-3 md:px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 text-sm md:text-base"
             >
               Listo
             </button>

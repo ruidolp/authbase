@@ -555,24 +555,24 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-2 sm:px-4 py-3">
-        <div className="flex items-center justify-between w-full gap-2 sm:gap-4">
-          <h1 className="text-base sm:text-xl font-bold text-gray-900 flex-shrink-0">CAMISOL TV</h1>
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-2 sm:px-4 py-2 sm:py-3">
+        <div className="flex items-center w-full gap-1 sm:gap-2 md:gap-4 max-w-full">
+          <h1 className="text-sm sm:text-base md:text-xl font-bold text-gray-900 whitespace-nowrap">CAMISOL TV</h1>
 
-          <form onSubmit={handleSearch} className="flex-1 max-w-2xl">
+          <form onSubmit={handleSearch} className="flex-1 min-w-0 max-w-2xl">
             <div className="flex">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Buscar videos..."
-                className="flex-1 min-w-0 px-2 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-l-lg focus:border-gray-400 focus:outline-none"
+                placeholder="Buscar..."
+                className="flex-1 min-w-0 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base border border-gray-300 rounded-l-lg focus:border-gray-400 focus:outline-none"
               />
               <button
                 type="submit"
-                className="px-3 sm:px-6 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-lg hover:bg-gray-200 flex-shrink-0"
+                className="px-2 sm:px-3 md:px-6 py-1.5 sm:py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-lg hover:bg-gray-200 flex-shrink-0"
               >
-                <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-gray-600" />
               </button>
             </div>
           </form>
@@ -581,7 +581,7 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
             {session ? (
               <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
                 <SheetTrigger asChild>
-                  <button className="p-1 sm:p-2 hover:bg-gray-100 rounded-full">
+                  <button className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full">
                     <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
                   </button>
                 </SheetTrigger>
@@ -641,7 +641,7 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
                 </SheetContent>
               </Sheet>
             ) : (
-              <div className="p-1 sm:p-2 opacity-50 cursor-default">
+              <div className="p-1.5 sm:p-2 opacity-50 cursor-default">
                 <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
               </div>
             )}
