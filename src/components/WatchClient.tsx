@@ -555,15 +555,15 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-2 sm:px-4 py-2 sm:py-3">
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-2 sm:px-4 py-3 sm:py-4">
         <div className="flex items-center w-full gap-1 sm:gap-2 md:gap-4 max-w-full">
           <div className="flex items-center gap-2 sm:gap-3">
             <Image
               src="/icon_camisol.png"
               alt="Camisol TV"
-              width={180}
-              height={72}
-              className="h-10 sm:h-12 w-auto object-contain drop-shadow-[0_6px_18px_rgba(255,47,140,0.28)]"
+              width={240}
+              height={120}
+              className="h-14 sm:h-16 md:h-18 w-auto object-contain drop-shadow-[0_6px_18px_rgba(255,47,140,0.28)]"
               priority
             />
           </div>
