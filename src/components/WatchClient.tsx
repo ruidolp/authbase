@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import { Search, Settings, Maximize, Minimize, Home, Film, Users, LogOut, Play, Tv } from "lucide-react"
+import { Search, Settings, Maximize, Minimize, Home, Film, Users, LogOut, Play } from "lucide-react"
 import { useSession, signOut } from "next-auth/react"
 import Link from "next/link"
 import {
@@ -555,7 +555,7 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-2 sm:px-4 py-3 sm:py-4">
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-2 sm:px-4 py-2 sm:py-3">
         <div className="flex items-center w-full gap-1 sm:gap-2 md:gap-4 max-w-full">
           <div className="flex items-center gap-2 sm:gap-3">
             <Image
@@ -587,16 +587,6 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
           </form>
 
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Link
-              href={familySlug ? `/watch/${familySlug}` : "/watch"}
-              aria-disabled={!familySlug}
-              tabIndex={familySlug ? undefined : -1}
-              className={`inline-flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors ${!familySlug ? "pointer-events-none opacity-60" : ""}`}
-            >
-              <Tv className="w-4 h-4" />
-              <span className="hidden sm:inline">Ver TV</span>
-              <span className="sm:hidden">TV</span>
-            </Link>
             <div className="flex-shrink-0">
               {session ? (
                 <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
