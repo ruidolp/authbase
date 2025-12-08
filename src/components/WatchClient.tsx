@@ -554,8 +554,8 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <header className="sticky top-0 z-50 bg-black border-b border-white/10 px-2 sm:px-4 py-2 sm:py-3">
+    <div className="min-h-screen bg-white text-gray-900">
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-2 sm:px-4 py-2 sm:py-3">
         <div className="flex items-center w-full gap-1 sm:gap-2 md:gap-4 max-w-full">
           <div className="flex items-center gap-2 sm:gap-3">
             <Image

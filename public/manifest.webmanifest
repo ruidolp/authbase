@@ -5,7 +5,7 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#fff7ed",
-  "theme_color": "#000000",
+  "theme_color": "#fff7ed",
   "icons": [
     {
       "src": "/camisol-icon-192.png",
