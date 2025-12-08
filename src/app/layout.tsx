@@ -5,7 +5,7 @@ import SessionProvider from "@/components/SessionProvider";
 export const metadata: Metadata = {
   title: "CamiSOL TV",
   description: "Accede a CamiSOL TV facilmente desde tu PWA.",
-  themeColor: "#ff2f8c",
+  themeColor: "#000000",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [

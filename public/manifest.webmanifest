@@ -4,8 +4,8 @@
   "description": "CamiSOL TV — acceso facil y seguro en tu PWA.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ff7ab3",
-  "theme_color": "#ff2f8c",
+  "background_color": "#fff7ed",
+  "theme_color": "#000000",
   "icons": [
     {
       "src": "/camisol-icon-192.png",

@@ -52,7 +52,7 @@
   --popover: #fff1e6;
   --popover-foreground: #1f130d;
   --primary: #ff7b5a;
-  --primary-foreground: #2b0f09;
+  --primary-foreground: #ffffff;
   --secondary: #ffe7b3;
   --secondary-foreground: #2b1a05;
   --muted: #ffd9c2;
@@ -135,6 +135,21 @@
     position: relative;
     background-image: var(--page-gradient);
     background-attachment: fixed;
+  }
+
+  /* Relleno de la zona segura en PWA iOS/Android para tintar el área del sistema */
+  @supports (padding: env(safe-area-inset-bottom)) {
+    body::after {
+      content: "";
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: env(safe-area-inset-bottom);
+      background: #000;
+      pointer-events: none;
+      z-index: 50;
+    }
   }
 }
 
