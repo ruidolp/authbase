@@ -7,6 +7,10 @@ export const metadata: Metadata = {
   description: "Accede a CamiSOL TV facilmente desde tu PWA.",
   themeColor: "#fff7ed",
   manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+  },
   icons: {
     icon: [
       { url: "/camisol-icon-192.png", sizes: "192x192", type: "image/png" },

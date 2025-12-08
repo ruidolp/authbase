@@ -57,6 +57,8 @@ interface WatchClientProps {
   familySlug?: string | null
 }
 
+const DEFAULT_THEME_COLOR = "#fff7ed"
+
 export function WatchClient({ familyId, initialVideos, userRole, familySlug }: WatchClientProps) {
   const { data: session } = useSession()
   const [videos] = useState<Video[]>(initialVideos)
@@ -424,6 +426,27 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
 
     return () => {
       document.body.classList.remove('fullscreen-active')
+    }
+  }, [isFullscreen])
+
+  // Ajustar meta theme-color para PWA cuando estamos en fullscreen
+  useEffect(() => {
+    const themeColor = isFullscreen ? "#000000" : DEFAULT_THEME_COLOR
+    let meta = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null
+
+    if (!meta) {
+      meta = document.createElement("meta")
+      meta.name = "theme-color"
+      document.head.appendChild(meta)
+    }
+
+    meta.setAttribute("content", themeColor)
+
+    return () => {
+      const currentMeta = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null
+      if (currentMeta) {
+        currentMeta.setAttribute("content", DEFAULT_THEME_COLOR)
+      }
     }
   }, [isFullscreen])
 
