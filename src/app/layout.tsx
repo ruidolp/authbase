@@ -5,7 +5,11 @@ import SessionProvider from "@/components/SessionProvider";
 export const metadata: Metadata = {
   title: "CamiSOL TV",
   description: "Accede a CamiSOL TV facilmente desde tu PWA.",
-  themeColor: "#fff7ed",
+  themeColor: [
+    { media: "(display-mode: standalone)", color: "#000000" },
+    { media: "(display-mode: fullscreen)", color: "#000000" },
+    { color: "#fff7ed" },
+  ],
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
