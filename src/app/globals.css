@@ -206,13 +206,15 @@
 /* Estilos para bloquear controles de YouTube en modo normal y fullscreen */
 .youtube-blocker-overlay {
   position: absolute;
-  pointer-events: all !important; /* Forzar captura de todos los eventos */
+  pointer-events: auto; /* Permitir eventos pero no forzar captura de todos */
   z-index: 10;
   background: transparent;
   cursor: default;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+  /* Bloquear solo clics en los controles de YouTube, pero permitir detección de movimiento */
+  touch-action: manipulation;
 }
 
 /* Overlay para bloquear el título en la parte superior */
@@ -252,9 +254,10 @@
   border-radius: 6px;
   padding: 10px;
   cursor: pointer;
-  transition: opacity 0.3s ease, background 0.2s ease;
+  transition: opacity 0.3s ease, background 0.2s ease, visibility 0s linear 0.3s;
   pointer-events: auto;
   opacity: 1;
+  visibility: visible;
 }
 
 .fullscreen-button:hover {
@@ -264,28 +267,37 @@
 .fullscreen-button.visible {
   opacity: 1;
   pointer-events: auto;
+  visibility: visible;
+  transition: opacity 0.3s ease, background 0.2s ease, visibility 0s linear 0s;
 }
 
 .fullscreen-button.hidden {
   opacity: 0;
   pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.3s ease, background 0.2s ease, visibility 0s linear 0.3s;
 }
 
 /* En desktop (pantalla grande), ocultar el botón por defecto en modo normal */
 @media (min-width: 1024px) {
   .fullscreen-button {
     opacity: 0;
-    transition: opacity 0.3s ease;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
   }
 
   /* Mostrar el botón cuando el mouse está sobre el contenedor del video */
   .w-full:hover .fullscreen-button {
     opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0s linear 0s;
   }
 
   /* Siempre mostrar el botón cuando se usa la clase visible */
   .fullscreen-button.visible {
     opacity: 1 !important;
+    visibility: visible !important;
+    transition: opacity 0.3s ease, visibility 0s linear 0s !important;
   }
 }
 
@@ -294,7 +306,9 @@
 :-webkit-full-screen .youtube-blocker-overlay,
 :-moz-full-screen .youtube-blocker-overlay,
 :-ms-fullscreen .youtube-blocker-overlay {
-  z-index: 2147483647 !important; /* Máximo z-index posible */
+  z-index: 2147483646 !important; /* Alto z-index pero menor que el botón */
+  pointer-events: auto;
+  touch-action: manipulation;
 }
 
 /* Asegurar que los overlays se mantengan visibles en fullscreen */
@@ -336,12 +350,29 @@
 :-webkit-full-screen .fullscreen-button,
 :-moz-full-screen .fullscreen-button,
 :-ms-fullscreen .fullscreen-button {
-  position: fixed;
-  top: 50%;
-  right: 24px;
-  transform: translateY(-50%);
-  z-index: 2147483647;
-  opacity: 1; /* Siempre visible en fullscreen cuando showControls está activo */
+  position: fixed !important;
+  top: 50% !important;
+  right: 24px !important;
+  transform: translateY(-50%) !important;
+  z-index: 2147483647 !important;
+}
+
+:fullscreen .fullscreen-button.visible,
+:-webkit-full-screen .fullscreen-button.visible,
+:-moz-full-screen .fullscreen-button.visible,
+:-ms-fullscreen .fullscreen-button.visible {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+:fullscreen .fullscreen-button.hidden,
+:-webkit-full-screen .fullscreen-button.hidden,
+:-moz-full-screen .fullscreen-button.hidden,
+:-ms-fullscreen .fullscreen-button.hidden {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 /* Ajustar el contenedor de video en fullscreen */
@@ -404,8 +435,10 @@
 
 /* Overlays de bloqueo en pseudo-fullscreen */
 .pseudo-fullscreen .youtube-blocker-overlay {
-  position: absolute !important;
+  position: fixed !important;
   z-index: 10000 !important;
+  pointer-events: auto;
+  touch-action: manipulation;
 }
 
 /* Ajustes para orientación PORTRAIT (vertical) */
@@ -454,9 +487,20 @@
 
 /* Botón de fullscreen en pseudo-fullscreen */
 .pseudo-fullscreen .fullscreen-button {
-  position: absolute !important;
+  position: fixed !important;
   z-index: 10001 !important;
-  opacity: 1 !important; /* Siempre visible en pseudo-fullscreen */
+}
+
+.pseudo-fullscreen .fullscreen-button.visible {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.pseudo-fullscreen .fullscreen-button.hidden {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 /* Posición del botón en portrait: al medio derecha (igual que desktop) */

@@ -314,6 +314,9 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
   async function toggleFullscreen() {
     if (!videoContainerRef.current) return
 
+    // Mostrar controles temporalmente al hacer toggle
+    setShowControls(true)
+
     try {
       if (!isFullscreen) {
         if (isIOS) {
@@ -446,22 +449,20 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
       showControlsTemporarily()
     }
 
-    const container = videoContainerRef.current
-    if (container) {
-      container.addEventListener('mousemove', handleInteraction)
-      container.addEventListener('touchstart', handleInteraction)
-      container.addEventListener('click', handleInteraction)
-    }
+    // Agregar listeners a todo el documento cuando está en fullscreen
+    document.addEventListener('mousemove', handleInteraction, { passive: true })
+    document.addEventListener('touchstart', handleInteraction, { passive: true })
+    document.addEventListener('touchmove', handleInteraction, { passive: true })
+    document.addEventListener('click', handleInteraction)
 
     return () => {
       if (controlsTimeoutRef.current) {
         clearTimeout(controlsTimeoutRef.current)
       }
-      if (container) {
-        container.removeEventListener('mousemove', handleInteraction)
-        container.removeEventListener('touchstart', handleInteraction)
-        container.removeEventListener('click', handleInteraction)
-      }
+      document.removeEventListener('mousemove', handleInteraction)
+      document.removeEventListener('touchstart', handleInteraction)
+      document.removeEventListener('touchmove', handleInteraction)
+      document.removeEventListener('click', handleInteraction)
     }
   }, [isFullscreen])
 
