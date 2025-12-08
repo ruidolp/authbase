@@ -651,7 +651,7 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
 
       <div className="w-full">
         <div ref={videoContainerRef} className="w-full">
-          <div className="bg-black overflow-hidden mb-4 w-full">
+          <div className="bg-black overflow-hidden mb-1 w-full">
             <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
               <div
                 id="player"
@@ -691,27 +691,25 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
           </div>
 
           {currentVideo && (
-            <div className="px-4 py-1">
-              <h1 className="text-xl font-semibold text-gray-900">
+            <div className="px-2 sm:px-4 py-0">
+              <h1 className="text-sm sm:text-base md:text-lg font-medium text-gray-900">
                 {currentVideo.nombre}
               </h1>
             </div>
           )}
         </div>
 
-        <div className="flex px-6 pb-6">
-          <div className="flex-1"></div>
-
-          <div className="w-96 bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
-            <div className="bg-gray-50 p-3 border-b border-gray-200">
-              <h2 className="text-base font-semibold text-gray-900">
-                Mis videos <span className="text-sm text-gray-600 font-normal">({displayedVideos.length})</span>
+        <div className="w-full mt-2">
+          <div className="w-full bg-gray-50 border-t border-gray-200 overflow-hidden">
+            <div className="bg-gray-50 px-2 sm:px-4 py-2 border-b border-gray-200">
+              <h2 className="text-sm sm:text-base font-semibold text-gray-900">
+                Mis videos <span className="text-xs sm:text-sm text-gray-600 font-normal">({displayedVideos.length})</span>
               </h2>
             </div>
 
             <div
-              className="p-2 space-y-1.5 overflow-y-auto"
-              style={{ maxHeight: "600px" }}
+              className="px-2 sm:px-4 py-2 space-y-1.5 overflow-y-auto"
+              style={{ maxHeight: "calc(100vh - 400px)", minHeight: "300px" }}
             >
               {displayedVideos.slice(0, visibleCount).map((video, index) => {
                 const isLastVideo = index === visibleCount - 1 && visibleCount < displayedVideos.length
@@ -720,25 +718,25 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
                     key={video.id}
                     ref={isLastVideo ? lastVideoRef : null}
                     onClick={() => playVideo(index)}
-                    className={`flex space-x-2 p-2 rounded-lg cursor-pointer transition-colors ${
+                    className={`flex gap-2 p-1.5 sm:p-2 rounded-lg cursor-pointer transition-colors ${
                       index === currentIndex
                         ? "bg-white border-l-4 border-gray-900"
                         : "hover:bg-white"
                     }`}
                   >
-                    <div className="relative w-28 h-16 flex-shrink-0">
+                    <div className="relative w-24 sm:w-28 h-14 sm:h-16 flex-shrink-0">
                       <Image
                         src={`https://img.youtube.com/vi/${video.video_id}/mqdefault.jpg`}
                         alt={video.nombre}
                         fill
                         className="object-cover rounded"
-                        sizes="112px"
+                        sizes="(max-width: 640px) 96px, 112px"
                         unoptimized
                       />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3
-                        className={`text-sm font-medium line-clamp-2 ${
+                        className={`text-xs sm:text-sm font-medium line-clamp-2 ${
                           index === currentIndex
                             ? "text-gray-900 font-semibold"
                             : "text-gray-700"
