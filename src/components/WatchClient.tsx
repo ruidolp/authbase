@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import { Search, Settings, Maximize, Minimize, Home, Film, Users, LogOut, Play } from "lucide-react"
+import { Search, Settings, Maximize, Minimize, Home, Film, Users, LogOut, Play, Tv } from "lucide-react"
 import { useSession, signOut } from "next-auth/react"
 import Link from "next/link"
 import {
@@ -577,74 +577,86 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
             </div>
           </form>
 
-          <div className="flex-shrink-0">
-            {session ? (
-              <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-                <SheetTrigger asChild>
-                  <button className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full">
-                    <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
-                  </button>
-                </SheetTrigger>
-                <SheetContent>
-                  <SheetHeader>
-                    <SheetTitle>Menú</SheetTitle>
-                  </SheetHeader>
-                  <nav className="flex flex-col gap-2 mt-6">
-                    <Link
-                      href="/dashboard"
-                      onClick={() => setMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
-                    >
-                      <Home className="w-5 h-5" />
-                      <span className="font-medium">Dashboard</span>
-                    </Link>
-                    <Link
-                      href="/editor"
-                      onClick={() => setMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
-                    >
-                      <Film className="w-5 h-5" />
-                      <span className="font-medium">Editor</span>
-                    </Link>
-                    {familySlug && (
-                      <Link
-                        href={`/watch/${familySlug}`}
-                        onClick={() => setMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
-                      >
-                        <Play className="w-5 h-5" />
-                        <span className="font-medium">Ver videos</span>
-                      </Link>
-                    )}
-                    {userRole === 'owner' && (
-                      <Link
-                        href="/family"
-                        onClick={() => setMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
-                      >
-                        <Users className="w-5 h-5" />
-                        <span className="font-medium">Familia</span>
-                      </Link>
-                    )}
-                    <div className="border-t border-gray-200 my-2" />
-                    <button
-                      onClick={() => {
-                        setMenuOpen(false)
-                        signOut({ callbackUrl: '/login' })
-                      }}
-                      className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors text-left w-full"
-                    >
-                      <LogOut className="w-5 h-5" />
-                      <span className="font-medium">Cerrar sesión</span>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Link
+              href={familySlug ? `/watch/${familySlug}` : "/watch"}
+              aria-disabled={!familySlug}
+              tabIndex={familySlug ? undefined : -1}
+              className={`inline-flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors ${!familySlug ? "pointer-events-none opacity-60" : ""}`}
+            >
+              <Tv className="w-4 h-4" />
+              <span className="hidden sm:inline">Ver TV</span>
+              <span className="sm:hidden">TV</span>
+            </Link>
+            <div className="flex-shrink-0">
+              {session ? (
+                <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+                  <SheetTrigger asChild>
+                    <button className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full">
+                      <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
                     </button>
-                  </nav>
-                </SheetContent>
-              </Sheet>
-            ) : (
-              <div className="p-1.5 sm:p-2 opacity-50 cursor-default">
-                <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
-              </div>
-            )}
+                  </SheetTrigger>
+                  <SheetContent>
+                    <SheetHeader>
+                      <SheetTitle>Menú</SheetTitle>
+                    </SheetHeader>
+                    <nav className="flex flex-col gap-2 mt-6">
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        <Home className="w-5 h-5" />
+                        <span className="font-medium">Dashboard</span>
+                      </Link>
+                      <Link
+                        href="/editor"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        <Film className="w-5 h-5" />
+                        <span className="font-medium">Editor</span>
+                      </Link>
+                      {familySlug && (
+                        <Link
+                          href={`/watch/${familySlug}`}
+                          onClick={() => setMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                        >
+                          <Play className="w-5 h-5" />
+                          <span className="font-medium">Ver videos</span>
+                        </Link>
+                      )}
+                      {userRole === 'owner' && (
+                        <Link
+                          href="/family"
+                          onClick={() => setMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                        >
+                          <Users className="w-5 h-5" />
+                          <span className="font-medium">Familia</span>
+                        </Link>
+                      )}
+                      <div className="border-t border-gray-200 my-2" />
+                      <button
+                        onClick={() => {
+                          setMenuOpen(false)
+                          signOut({ callbackUrl: '/login' })
+                        }}
+                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors text-left w-full"
+                      >
+                        <LogOut className="w-5 h-5" />
+                        <span className="font-medium">Cerrar sesión</span>
+                      </button>
+                    </nav>
+                  </SheetContent>
+                </Sheet>
+              ) : (
+                <div className="p-1.5 sm:p-2 opacity-50 cursor-default">
+                  <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>

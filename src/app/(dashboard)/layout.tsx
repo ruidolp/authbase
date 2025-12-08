@@ -1,8 +1,8 @@
 import { auth } from "@/lib/auth"
-import { Navigation } from "@/components/Navigation"
 import { prisma } from "@/lib/prisma"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
+import { Navigation } from "@/components/Navigation"
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import { DashboardHeader } from "@/components/DashboardHeader"
 
 export default async function DashboardLayout({
   children,
@@ -39,16 +39,10 @@ export default async function DashboardLayout({
     <SidebarProvider>
       <Navigation userRole={userRole} familySlug={familySlug} />
       <SidebarInset>
-        <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
-          <SidebarTrigger className="-ml-1" />
-          <span className="text-sm text-muted-foreground flex items-center gap-2">
-            Hola {session?.user?.name || 'amigo'} <span aria-hidden="true">👋</span>
-          </span>
-          <Separator orientation="vertical" className="h-6" />
-          <div id="page-header" className="flex-1">
-            {/* Los títulos de página se inyectarán aquí */}
-          </div>
-        </header>
+        <DashboardHeader
+          userName={session?.user?.name}
+          familySlug={familySlug}
+        />
         <main className="flex-1 p-4 md:p-6">
           {children}
         </main>

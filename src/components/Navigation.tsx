@@ -12,8 +12,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarProvider,
-  SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar"
 
 interface NavigationProps {
@@ -23,6 +22,7 @@ interface NavigationProps {
 
 export function Navigation({ userRole, familySlug }: NavigationProps) {
   const pathname = usePathname()
+  const { isMobile, setOpenMobile } = useSidebar()
 
   const links = [
     { href: "/dashboard", label: "Dashboard", icon: Home },
@@ -35,6 +35,12 @@ export function Navigation({ userRole, familySlug }: NavigationProps) {
 
   if (userRole === 'owner') {
     links.push({ href: "/family", label: "Familia", icon: Users })
+  }
+
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false)
+    }
   }
 
   return (
@@ -56,7 +62,7 @@ export function Navigation({ userRole, familySlug }: NavigationProps) {
             return (
               <SidebarMenuItem key={link.href}>
                 <SidebarMenuButton asChild isActive={isActive} size="lg">
-                  <Link href={link.href} className="gap-3 px-4 py-3">
+                  <Link href={link.href} onClick={handleLinkClick} className="gap-3 px-4 py-3">
                     <Icon className="w-5 h-5" />
                     <span className="font-medium">{link.label}</span>
                   </Link>
