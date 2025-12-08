@@ -9,35 +9,9 @@
       <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
       <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
     </linearGradient>
-    <radialGradient id="sun-core" cx="50%" cy="50%" r="55%">
-      <stop offset="0%" stop-color="#fff7ff"/>
-      <stop offset="45%" stop-color="#ffbfdd"/>
-      <stop offset="100%" stop-color="#ff74b5"/>
-    </radialGradient>
-    <radialGradient id="sun-aura" cx="50%" cy="50%" r="80%">
-      <stop offset="0%" stop-color="#ffd8f2" stop-opacity="0.65"/>
-      <stop offset="100%" stop-color="#ff8bc6" stop-opacity="0"/>
-    </radialGradient>
-    <filter id="sun-soft" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="18"/>
-    </filter>
   </defs>
   <rect x="24" y="24" width="464" height="464" rx="112" fill="url(#bg)"/>
-  <g transform="translate(380 154)">
-    <circle r="118" fill="url(#sun-aura)" filter="url(#sun-soft)"/>
-    <g stroke="#ffe6f5" stroke-width="12" stroke-linecap="round" opacity="0.85">
-      <line x1="0" y1="-114" x2="0" y2="-154"/>
-      <line x1="0" y1="114" x2="0" y2="154"/>
-      <line x1="-114" y1="0" x2="-154" y2="0"/>
-      <line x1="114" y1="0" x2="154" y2="0"/>
-      <line x1="80" y1="-80" x2="116" y2="-116"/>
-      <line x1="-80" y1="-80" x2="-116" y2="-116"/>
-      <line x1="80" y1="80" x2="116" y2="116"/>
-      <line x1="-80" y1="80" x2="-116" y2="116"/>
-    </g>
-    <circle r="78" fill="url(#sun-core)"/>
-    <circle r="46" fill="#ffffff" opacity="0.35"/>
-  </g>
+  <circle cx="380" cy="154" r="78" fill="#ffd1ec" opacity="0.35"/>
   <path d="M140 210c12-54 65-96 140-96 79 0 132 45 132 112 0 74-62 125-152 125-43 0-79-11-109-33v40c0 25-19 46-48 46-28 0-48-18-48-46V210h85z" fill="#fff" opacity="0.18"/>
   <path d="M139 214c11-50 61-88 135-88 73 0 122 41 122 103 0 68-58 115-145 115-41 0-75-10-103-30v37c0 24-17 43-44 43s-44-17-44-43V214h79z" fill="#fff" opacity="0.35"/>
   <path d="M155 228c9-43 56-74 118-74 64 0 106 37 106 94 0 60-52 101-126 101-36 0-66-9-91-27v33c0 22-16 40-41 40-24 0-41-16-41-40V228h75z" fill="#fff"/>

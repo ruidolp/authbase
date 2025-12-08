@@ -1,7 +1,7 @@
 {
-  "name": "Camisol",
-  "short_name": "Camisol",
-  "description": "Camisol — acceso facil y seguro en tu PWA.",
+  "name": "CamiSOL TV",
+  "short_name": "CamiSOL TV",
+  "description": "CamiSOL TV — acceso facil y seguro en tu PWA.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ff7ab3",

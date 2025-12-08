@@ -79,6 +79,8 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
   const [isIOS, setIsIOS] = useState(false)
   const [showControls, setShowControls] = useState(true)
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const observerRef = useRef<IntersectionObserver | null>(null)
+  const lastVideoRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     setDisplayedVideos(shuffleArray([...videos]))
@@ -310,10 +312,6 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     setVisibleCount(10)
   }
 
-  function loadMore() {
-    setVisibleCount((prev) => prev + 10)
-  }
-
   // Función para mostrar controles temporalmente
   function handleShowControls() {
     if (!isFullscreen) return // Solo en fullscreen
@@ -515,6 +513,36 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     return () => window.removeEventListener("beforeunload", handleBeforeUnload)
   }, [])
 
+  // Infinite scroll automático
+  useEffect(() => {
+    if (!lastVideoRef.current) return
+
+    const options = {
+      root: null,
+      rootMargin: '100px',
+      threshold: 0.1
+    }
+
+    const callback = (entries: IntersectionObserverEntry[]) => {
+      const [entry] = entries
+      if (entry.isIntersecting && visibleCount < displayedVideos.length) {
+        setVisibleCount(prev => prev + 10)
+      }
+    }
+
+    observerRef.current = new IntersectionObserver(callback, options)
+
+    if (lastVideoRef.current) {
+      observerRef.current.observe(lastVideoRef.current)
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+      }
+    }
+  }, [visibleCount, displayedVideos.length])
+
   const currentVideo = displayedVideos[currentIndex]
 
   if (displayedVideos.length === 0) {
@@ -529,7 +557,7 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     <div className="min-h-screen bg-white">
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-2 sm:px-4 py-3">
         <div className="flex items-center justify-between w-full gap-2 sm:gap-4">
-          <h1 className="text-base sm:text-xl font-bold text-gray-900 flex-shrink-0">MyFTV</h1>
+          <h1 className="text-base sm:text-xl font-bold text-gray-900 flex-shrink-0">CAMISOL TV</h1>
 
           <form onSubmit={handleSearch} className="flex-1 max-w-2xl">
             <div className="flex">
@@ -663,8 +691,8 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
           </div>
 
           {currentVideo && (
-            <div className="px-6 py-4">
-              <h1 className="text-2xl font-semibold text-gray-900">
+            <div className="px-4 py-1">
+              <h1 className="text-xl font-semibold text-gray-900">
                 {currentVideo.nombre}
               </h1>
             </div>
@@ -675,57 +703,53 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
           <div className="flex-1"></div>
 
           <div className="w-96 bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
-            <div className="bg-gray-50 p-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Más Videos</h2>
-              <p className="text-sm text-gray-600">{displayedVideos.length} videos</p>
+            <div className="bg-gray-50 p-3 border-b border-gray-200">
+              <h2 className="text-base font-semibold text-gray-900">
+                Mis videos <span className="text-sm text-gray-600 font-normal">({displayedVideos.length})</span>
+              </h2>
             </div>
 
             <div
-              className="p-4 space-y-3 overflow-y-auto"
+              className="p-2 space-y-1.5 overflow-y-auto"
               style={{ maxHeight: "600px" }}
             >
-              {displayedVideos.slice(0, visibleCount).map((video, index) => (
-                <div
-                  key={video.id}
-                  onClick={() => playVideo(index)}
-                  className={`flex space-x-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                    index === currentIndex
-                      ? "bg-white border-l-4 border-gray-900"
-                      : "hover:bg-white"
-                  }`}
-                >
-                  <div className="relative w-40 h-24 flex-shrink-0">
-                    <Image
-                      src={`https://img.youtube.com/vi/${video.video_id}/mqdefault.jpg`}
-                      alt={video.nombre}
-                      fill
-                      className="object-cover rounded"
-                      sizes="160px"
-                      unoptimized
-                    />
+              {displayedVideos.slice(0, visibleCount).map((video, index) => {
+                const isLastVideo = index === visibleCount - 1 && visibleCount < displayedVideos.length
+                return (
+                  <div
+                    key={video.id}
+                    ref={isLastVideo ? lastVideoRef : null}
+                    onClick={() => playVideo(index)}
+                    className={`flex space-x-2 p-2 rounded-lg cursor-pointer transition-colors ${
+                      index === currentIndex
+                        ? "bg-white border-l-4 border-gray-900"
+                        : "hover:bg-white"
+                    }`}
+                  >
+                    <div className="relative w-28 h-16 flex-shrink-0">
+                      <Image
+                        src={`https://img.youtube.com/vi/${video.video_id}/mqdefault.jpg`}
+                        alt={video.nombre}
+                        fill
+                        className="object-cover rounded"
+                        sizes="112px"
+                        unoptimized
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3
+                        className={`text-sm font-medium line-clamp-2 ${
+                          index === currentIndex
+                            ? "text-gray-900 font-semibold"
+                            : "text-gray-700"
+                        }`}
+                      >
+                        {video.nombre}
+                      </h3>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3
-                      className={`text-sm font-medium line-clamp-2 ${
-                        index === currentIndex
-                          ? "text-gray-900 font-semibold"
-                          : "text-gray-700"
-                      }`}
-                    >
-                      {video.nombre}
-                    </h3>
-                  </div>
-                </div>
-              ))}
-
-              {visibleCount < displayedVideos.length && (
-                <button
-                  onClick={loadMore}
-                  className="w-full py-2 text-sm text-gray-600 hover:text-gray-900"
-                >
-                  Cargar más videos...
-                </button>
-              )}
+                )
+              })}
             </div>
           </div>
         </div>
