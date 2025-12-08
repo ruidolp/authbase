@@ -1,6 +1,8 @@
 import { auth } from "@/lib/auth"
 import { Navigation } from "@/components/Navigation"
 import { prisma } from "@/lib/prisma"
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
+import { Separator } from "@/components/ui/separator"
 
 export default async function DashboardLayout({
   children,
@@ -8,13 +10,13 @@ export default async function DashboardLayout({
   children: React.ReactNode
 }) {
   const session = await auth()
-  
+
   console.log('🏠 Layout Dashboard:', {
     hasSession: !!session,
     userId: session?.user?.id,
     familyId: session?.user?.familyId
   })
-  
+
   let userRole = null
   let familySlug = null
 
@@ -34,11 +36,20 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <SidebarProvider>
       <Navigation userRole={userRole} familySlug={familySlug} />
-      <main className="flex-1 ml-64">
-        {children}
-      </main>
-    </div>
+      <SidebarInset>
+        <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
+          <SidebarTrigger className="-ml-1" />
+          <Separator orientation="vertical" className="h-6" />
+          <div className="flex-1">
+            {/* Espacio para breadcrumbs u otros elementos del header */}
+          </div>
+        </header>
+        <main className="flex-1 p-4 md:p-6">
+          {children}
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

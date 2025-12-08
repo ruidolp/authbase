@@ -2,15 +2,16 @@
 
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import { Search, User, Maximize, Minimize } from "lucide-react"
-import { useSession } from "next-auth/react"
+import { Search, Settings, Maximize, Minimize, Home, Film, Users, LogOut, Play } from "lucide-react"
+import { useSession, signOut } from "next-auth/react"
 import Link from "next/link"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 
 declare global {
   interface Window {
@@ -52,15 +53,18 @@ interface WatchClientProps {
   familyId: string
   familyName: string
   initialVideos: Video[]
+  userRole?: string | null
+  familySlug?: string | null
 }
 
-export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
+export function WatchClient({ familyId, initialVideos, userRole, familySlug }: WatchClientProps) {
   const { data: session } = useSession()
   const [videos] = useState<Video[]>(initialVideos)
   const [displayedVideos, setDisplayedVideos] = useState<Video[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [searchQuery, setSearchQuery] = useState("")
   const [visibleCount, setVisibleCount] = useState(10)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const playerRef = useRef<{
     destroy?: () => void
@@ -547,22 +551,70 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
 
           <div className="flex-shrink-0">
             {session ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="p-1 sm:p-2 hover:bg-gray-100 rounded-full">
-                  <User className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard">Dashboard</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/editor">Editar Playlist</Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+                <SheetTrigger asChild>
+                  <button className="p-1 sm:p-2 hover:bg-gray-100 rounded-full">
+                    <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+                  </button>
+                </SheetTrigger>
+                <SheetContent>
+                  <SheetHeader>
+                    <SheetTitle>Menú</SheetTitle>
+                  </SheetHeader>
+                  <nav className="flex flex-col gap-2 mt-6">
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <Home className="w-5 h-5" />
+                      <span className="font-medium">Dashboard</span>
+                    </Link>
+                    <Link
+                      href="/editor"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <Film className="w-5 h-5" />
+                      <span className="font-medium">Editor</span>
+                    </Link>
+                    {familySlug && (
+                      <Link
+                        href={`/watch/${familySlug}`}
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        <Play className="w-5 h-5" />
+                        <span className="font-medium">Ver videos</span>
+                      </Link>
+                    )}
+                    {userRole === 'owner' && (
+                      <Link
+                        href="/family"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        <Users className="w-5 h-5" />
+                        <span className="font-medium">Familia</span>
+                      </Link>
+                    )}
+                    <div className="border-t border-gray-200 my-2" />
+                    <button
+                      onClick={() => {
+                        setMenuOpen(false)
+                        signOut({ callbackUrl: '/login' })
+                      }}
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors text-left w-full"
+                    >
+                      <LogOut className="w-5 h-5" />
+                      <span className="font-medium">Cerrar sesión</span>
+                    </button>
+                  </nav>
+                </SheetContent>
+              </Sheet>
             ) : (
               <div className="p-1 sm:p-2 opacity-50 cursor-default">
-                <User className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
+                <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
               </div>
             )}
           </div>
