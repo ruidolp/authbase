@@ -414,6 +414,19 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     }
   }, [isIOS])
 
+  // Pintar la zona segura en negro cuando estamos en fullscreen (especial PWA)
+  useEffect(() => {
+    if (isFullscreen) {
+      document.body.classList.add('fullscreen-active')
+    } else {
+      document.body.classList.remove('fullscreen-active')
+    }
+
+    return () => {
+      document.body.classList.remove('fullscreen-active')
+    }
+  }, [isFullscreen])
+
   // Detectar cambios de orientación en iOS durante pseudo-fullscreen
   useEffect(() => {
     if (!isIOS) return

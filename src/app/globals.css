@@ -137,6 +137,12 @@
     background-attachment: fixed;
   }
 
+  /* Fondo liso para estados de fullscreen */
+  body.fullscreen-active {
+    background: #000;
+    background-image: none;
+  }
+
   /* Relleno de la zona segura en PWA iOS/Android para tintar el área del sistema */
   @supports (padding: env(safe-area-inset-bottom)) {
     body::after {
@@ -149,6 +155,10 @@
       background: var(--background);
       pointer-events: none;
       z-index: 50;
+    }
+
+    body.fullscreen-active::after {
+      background: #000;
     }
   }
 }
