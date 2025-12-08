@@ -505,33 +505,33 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-4 py-3">
-        <div className="flex items-center justify-between max-w-full">
-          <h1 className="text-xl font-bold text-gray-900">MyFTV</h1>
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-2 sm:px-4 py-3">
+        <div className="flex items-center justify-between w-full gap-2 sm:gap-4">
+          <h1 className="text-base sm:text-xl font-bold text-gray-900 flex-shrink-0">MyFTV</h1>
 
-          <form onSubmit={handleSearch} className="flex-1 max-w-2xl mx-8">
+          <form onSubmit={handleSearch} className="flex-1 max-w-2xl">
             <div className="flex">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Buscar videos..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:border-gray-400 focus:outline-none"
+                className="flex-1 min-w-0 px-2 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-l-lg focus:border-gray-400 focus:outline-none"
               />
               <button
                 type="submit"
-                className="px-6 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-lg hover:bg-gray-200"
+                className="px-3 sm:px-6 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-lg hover:bg-gray-200 flex-shrink-0"
               >
-                <Search className="w-5 h-5 text-gray-600" />
+                <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
               </button>
             </div>
           </form>
 
-          <div>
+          <div className="flex-shrink-0">
             {session ? (
               <DropdownMenu>
-                <DropdownMenuTrigger className="p-2 hover:bg-gray-100 rounded-full">
-                  <User className="w-6 h-6 text-gray-700" />
+                <DropdownMenuTrigger className="p-1 sm:p-2 hover:bg-gray-100 rounded-full">
+                  <User className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
@@ -543,18 +543,18 @@ export function WatchClient({ familyId, initialVideos }: WatchClientProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="p-2 opacity-50 cursor-default">
-                <User className="w-6 h-6 text-gray-400" />
+              <div className="p-1 sm:p-2 opacity-50 cursor-default">
+                <User className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
               </div>
             )}
           </div>
         </div>
       </header>
 
-      <div className="max-w-full">
+      <div className="w-full">
         <div ref={videoContainerRef} className="w-full">
-          <div className="bg-black overflow-hidden mb-4">
-            <div className="relative w-full" style={{ paddingBottom: "45%" }}>
+          <div className="bg-black overflow-hidden mb-4 w-full">
+            <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
               <div
                 id="player"
                 className="absolute top-0 left-0 w-full h-full"
