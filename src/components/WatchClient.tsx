@@ -610,7 +610,7 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
               alt="Camisol TV"
               width={240}
               height={120}
-              className="h-20 sm:h-24 md:h-28 w-auto object-contain drop-shadow-[0_6px_18px_rgba(255,47,140,0.28)] -my-3 sm:-my-4"
+              className="h-28 sm:h-32 md:h-36 w-auto object-contain drop-shadow-[0_6px_18px_rgba(255,47,140,0.28)] -my-6 sm:-my-8"
               priority
             />
           </div>
