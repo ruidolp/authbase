@@ -123,37 +123,23 @@
     @apply border-border outline-ring/50;
   }
   html {
-    overflow: hidden;
+    overflow-x: hidden;
     width: 100%;
-    max-width: 100%;
     background-color: var(--background);
-    /* Prevenir scroll horizontal en iOS */
-    position: fixed;
-    height: 100%;
   }
   body {
     @apply bg-background text-foreground;
     overflow-x: hidden;
-    overflow-y: auto;
     width: 100%;
-    max-width: 100%;
-    height: 100%;
     position: relative;
     background-image: var(--page-gradient);
     background-attachment: fixed;
-    /* Permitir scroll vertical */
     -webkit-overflow-scrolling: touch;
   }
 
   /* Prevenir zoom en inputs en iOS - font-size >= 16px evita el zoom */
   input, textarea, select {
     font-size: 16px !important;
-  }
-
-  @media screen and (max-width: 768px) {
-    input, textarea, select {
-      font-size: 16px !important;
-    }
   }
 
   /* Fondo liso para estados de fullscreen - incluye html para PWA */
