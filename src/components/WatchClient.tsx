@@ -98,7 +98,7 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     // Detectar si estamos en PWA (standalone mode)
     const isPWAMode = window.matchMedia('(display-mode: standalone)').matches ||
                       window.matchMedia('(display-mode: fullscreen)').matches ||
-                      (window.navigator as any).standalone === true
+                      ('standalone' in window.navigator && (window.navigator as { standalone?: boolean }).standalone === true)
     setIsPWA(isPWAMode)
 
     console.log('Device detection:', { ios, isPWAMode })
