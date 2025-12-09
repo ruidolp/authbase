@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Home, Film, Users, LogOut, Play } from "lucide-react"
 import { signOut } from "next-auth/react"
@@ -46,9 +47,15 @@ export function Navigation({ userRole, familySlug }: NavigationProps) {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b">
-        <div className="flex items-center justify-between px-2 py-4">
-          <Link href="/dashboard" className="font-bold text-xl text-gray-900">
-            MyFTV
+        <div className="flex items-center justify-center px-2 py-4">
+          <Link href="/dashboard">
+            <Image
+              src="/icon_camisol.png"
+              alt="Logo"
+              width={64}
+              height={64}
+              className="w-16 h-16"
+            />
           </Link>
         </div>
       </SidebarHeader>
