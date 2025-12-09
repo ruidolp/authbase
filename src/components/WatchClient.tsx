@@ -474,7 +474,7 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
       androidStatusBar.setAttribute("content", "black-translucent")
 
       // Meta tag adicional para iOS
-      let appleStatusBar = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]') as HTMLMetaElement | null
+      const appleStatusBar = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]') as HTMLMetaElement | null
       if (appleStatusBar) {
         appleStatusBar.setAttribute("content", "black-translucent")
       }
