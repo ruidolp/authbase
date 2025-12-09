@@ -51,10 +51,11 @@ export function Navigation({ userRole, familySlug }: NavigationProps) {
           <Link href="/dashboard">
             <Image
               src="/icon_camisol.png"
-              alt="Logo"
-              width={64}
-              height={64}
-              className="w-16 h-16"
+              alt="Camisol TV"
+              width={240}
+              height={120}
+              className="h-28 sm:h-32 md:h-36 w-auto object-contain drop-shadow-[0_6px_18px_rgba(255,47,140,0.28)] -my-6 sm:-my-8"
+              priority
             />
           </Link>
         </div>
