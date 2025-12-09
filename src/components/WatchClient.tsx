@@ -417,14 +417,19 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
   }, [isIOS])
 
   // Pintar la zona segura en negro cuando estamos en fullscreen (especial PWA)
+  // IMPORTANTE: Agregar clase tanto a html como a body para que PWA pinte el safe-area-inset en negro
   useEffect(() => {
+    const html = document.documentElement
     if (isFullscreen) {
+      html.classList.add('fullscreen-active')
       document.body.classList.add('fullscreen-active')
     } else {
+      html.classList.remove('fullscreen-active')
       document.body.classList.remove('fullscreen-active')
     }
 
     return () => {
+      html.classList.remove('fullscreen-active')
       document.body.classList.remove('fullscreen-active')
     }
   }, [isFullscreen])

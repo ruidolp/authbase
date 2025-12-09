@@ -126,6 +126,7 @@
     overflow-x: hidden;
     width: 100%;
     max-width: 100vw;
+    background-color: var(--background);
   }
   body {
     @apply bg-background text-foreground;
@@ -137,10 +138,13 @@
     background-attachment: fixed;
   }
 
-  /* Fondo liso para estados de fullscreen */
+  /* Fondo liso para estados de fullscreen - incluye html para PWA */
+  html.fullscreen-active,
+  html.fullscreen-active body,
   body.fullscreen-active {
-    background: #000;
-    background-image: none;
+    background: #000 !important;
+    background-image: none !important;
+    background-color: #000 !important;
   }
 
   /* Relleno de la zona segura en PWA iOS/Android para tintar el área del sistema */
@@ -154,11 +158,12 @@
       height: env(safe-area-inset-bottom);
       background: var(--background);
       pointer-events: none;
-      z-index: 50;
+      z-index: 99999;
     }
 
-    body.fullscreen-active::after {
-      background: #000;
+    body.fullscreen-active::after,
+    html.fullscreen-active body::after {
+      background: #000 !important;
     }
   }
 }
