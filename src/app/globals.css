@@ -184,13 +184,7 @@
       width: env(safe-area-inset-left);
       background: var(--background);
       pointer-events: none;
-      z-index: 99999;
-    }
-
-    /* En fullscreen, ocultar el pseudo-elemento para que el video use todo el espacio */
-    body.fullscreen-active::before,
-    html.fullscreen-active body::before {
-      display: none !important;
+      z-index: -1;
     }
   }
 
@@ -205,12 +199,7 @@
       width: env(safe-area-inset-right);
       background: var(--background);
       pointer-events: none;
-      z-index: 99999;
-    }
-
-    /* En fullscreen, ocultar el pseudo-elemento para que el video use todo el espacio */
-    html.fullscreen-active::after {
-      display: none !important;
+      z-index: -1;
     }
   }
 }
