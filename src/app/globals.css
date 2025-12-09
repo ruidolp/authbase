@@ -161,10 +161,20 @@
     background-color: #000 !important;
   }
 
+  /* Cuando hay un elemento con pseudo-fullscreen, forzar negro en TODO el documento */
+  body:has(.pseudo-fullscreen),
+  html:has(.pseudo-fullscreen) {
+    background: #000 !important;
+    background-image: none !important;
+    background-color: #000 !important;
+    overflow: hidden !important;
+  }
+
   /* Forzar color de barra de estado en Android */
   @supports (-webkit-touch-callout: none) {
     html[data-fullscreen="true"]::before,
-    html.fullscreen-active::before {
+    html.fullscreen-active::before,
+    html:has(.pseudo-fullscreen)::before {
       content: "";
       position: fixed;
       top: 0;
@@ -536,36 +546,60 @@
 }
 
 /* ============================================ */
-/* Pseudo-fullscreen para iOS (Safari/Chrome) */
+/* Pseudo-fullscreen para PWA (iOS y Android) */
 /* ============================================ */
 
 /* Contenedor principal en pseudo-fullscreen */
-/* Usar inset: 0 para cubrir toda la pantalla */
+/* CRÍTICO: inset: 0 cubre TODO incluyendo el área de navegación del sistema en Android PWA */
 .pseudo-fullscreen {
   position: fixed !important;
-  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  /* En Android PWA, 100vh incluye el área de navegación cuando está oculta */
+  max-height: 100vh !important;
   z-index: 9999 !important;
-  background: black !important;
+  background: #000 !important;
+  background-color: #000 !important;
   overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .pseudo-fullscreen .relative {
   padding-bottom: 0 !important;
   position: absolute !important;
-  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .pseudo-fullscreen #player {
   position: absolute !important;
-  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* Iframe del player también debe ocupar todo */
 .pseudo-fullscreen #player iframe {
   position: absolute !important;
-  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
   width: 100% !important;
   height: 100% !important;
+  border: 0 !important;
 }
 
 /* Overlays de bloqueo en pseudo-fullscreen */

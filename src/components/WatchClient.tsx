@@ -79,6 +79,7 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
   const isTrackingRef = useRef(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
+  const [isPWA, setIsPWA] = useState(false)
   const [showControls, setShowControls] = useState(true)
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const observerRef = useRef<IntersectionObserver | null>(null)
@@ -88,11 +89,19 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     setDisplayedVideos(shuffleArray([...videos]))
   }, [videos])
 
-  // Detectar iOS
+  // Detectar iOS y PWA mode
   useEffect(() => {
     const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
                 (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
     setIsIOS(ios)
+
+    // Detectar si estamos en PWA (standalone mode)
+    const isPWAMode = window.matchMedia('(display-mode: standalone)').matches ||
+                      window.matchMedia('(display-mode: fullscreen)').matches ||
+                      (window.navigator as any).standalone === true
+    setIsPWA(isPWAMode)
+
+    console.log('Device detection:', { ios, isPWAMode })
   }, [])
 
   useEffect(() => {
@@ -340,8 +349,10 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
 
     try {
       if (!isFullscreen) {
-        if (isIOS) {
-          // iOS: Usar pseudo-fullscreen con CSS (inset: 0 maneja todo)
+        // En PWA (iOS o Android) SIEMPRE usamos pseudo-fullscreen
+        // porque la API nativa no cubre el área de navegación del sistema en Android PWA
+        if (isPWA || isIOS) {
+          console.log('Usando pseudo-fullscreen para PWA')
           const isLandscape = window.innerWidth > window.innerHeight
           videoContainerRef.current.setAttribute('data-orientation', isLandscape ? 'landscape' : 'portrait')
           videoContainerRef.current.classList.add('pseudo-fullscreen')
@@ -349,7 +360,8 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
           setIsFullscreen(true)
           document.body.style.overflow = 'hidden'
         } else {
-          // Android/Desktop: Fullscreen API nativa con opciones para ocultar navegación
+          // Browser normal (Chrome mobile, Firefox, etc): Usar API nativa
+          console.log('Usando fullscreen nativo para browser')
           const fullscreenOptions = { navigationUI: "hide" as const }
 
           if (videoContainerRef.current.requestFullscreen) {
@@ -363,15 +375,17 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
           }
         }
       } else {
-        if (isIOS) {
-          // iOS: Salir de pseudo-fullscreen
+        if (isPWA || isIOS) {
+          // Salir de pseudo-fullscreen
+          console.log('Saliendo de pseudo-fullscreen')
           videoContainerRef.current.classList.remove('pseudo-fullscreen')
           videoContainerRef.current.removeAttribute('data-orientation')
 
           setIsFullscreen(false)
           document.body.style.overflow = ''
         } else {
-          // Android/Desktop: Salir de fullscreen nativo
+          // Salir de fullscreen nativo
+          console.log('Saliendo de fullscreen nativo')
           if (document.exitFullscreen) {
             await document.exitFullscreen()
           } else if (document.webkitExitFullscreen) {
@@ -388,9 +402,10 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     }
   }
 
-  // Detectar cambios de fullscreen (solo para Android/Desktop, no iOS)
+  // Detectar cambios de fullscreen (solo para browser normal, no PWA ni iOS)
   useEffect(() => {
-    if (isIOS) return // iOS usa pseudo-fullscreen, no necesita estos listeners
+    // En PWA o iOS usamos pseudo-fullscreen, no necesitamos estos listeners
+    if (isPWA || isIOS) return
 
     function handleFullscreenChange() {
       const isCurrentlyFullscreen = !!(
@@ -418,7 +433,7 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
       document.removeEventListener('mozfullscreenchange', handleFullscreenChange)
       document.removeEventListener('MSFullscreenChange', handleFullscreenChange)
     }
-  }, [isIOS])
+  }, [isPWA, isIOS])
 
   // Pintar la zona segura en negro cuando estamos en fullscreen (especial PWA)
   // IMPORTANTE: Agregar clase tanto a html como a body para que PWA pinte el safe-area-inset en negro
@@ -511,14 +526,16 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     }
   }, [isFullscreen])
 
-  // Detectar cambios de orientación en iOS durante pseudo-fullscreen
+  // Detectar cambios de orientación durante pseudo-fullscreen (PWA y iOS)
   useEffect(() => {
-    if (!isIOS) return
+    // Solo para PWA o iOS que usan pseudo-fullscreen
+    if (!isPWA && !isIOS) return
 
     const updateOrientation = () => {
       if (isFullscreen && videoContainerRef.current) {
         const isLandscape = window.innerWidth > window.innerHeight
         videoContainerRef.current.setAttribute('data-orientation', isLandscape ? 'landscape' : 'portrait')
+        console.log('Orientación actualizada:', isLandscape ? 'landscape' : 'portrait')
       }
     }
 
@@ -534,7 +551,7 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
       window.removeEventListener('orientationchange', updateOrientation)
       window.removeEventListener('resize', updateOrientation)
     }
-  }, [isIOS, isFullscreen])
+  }, [isPWA, isIOS, isFullscreen])
 
   // Auto-hide de controles en fullscreen
   useEffect(() => {
