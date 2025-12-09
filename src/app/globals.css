@@ -166,6 +166,45 @@
       background: #000 !important;
     }
   }
+
+  /* Relleno para safe-area-inset-left (notch en landscape izquierda) */
+  @supports (padding: env(safe-area-inset-left)) {
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: env(safe-area-inset-left);
+      background: var(--background);
+      pointer-events: none;
+      z-index: 99999;
+    }
+
+    body.fullscreen-active::before,
+    html.fullscreen-active body::before {
+      background: #000 !important;
+    }
+  }
+
+  /* Relleno para safe-area-inset-right (notch en landscape derecha) */
+  @supports (padding: env(safe-area-inset-right)) {
+    html::after {
+      content: "";
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      width: env(safe-area-inset-right);
+      background: var(--background);
+      pointer-events: none;
+      z-index: 99999;
+    }
+
+    html.fullscreen-active::after {
+      background: #000 !important;
+    }
+  }
 }
 
 /* Video Components Styles */
@@ -482,24 +521,32 @@
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
-  width: 100vw !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  /* Fallback para navegadores que no soportan dvh */
   height: 100vh !important;
+  height: 100dvh !important;
   z-index: 9999 !important;
   background: black !important;
 }
 
 .pseudo-fullscreen .relative {
   padding-bottom: 0 !important;
-  height: 100vh !important;
-  width: 100vw !important;
+  height: 100% !important;
+  height: 100dvh !important;
+  width: 100% !important;
 }
 
 .pseudo-fullscreen #player {
   position: absolute !important;
   top: 0 !important;
   left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* Overlays de bloqueo en pseudo-fullscreen */
