@@ -341,10 +341,30 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     try {
       if (!isFullscreen) {
         if (isIOS) {
-          // iOS: Usar pseudo-fullscreen con CSS
-          const isLandscape = window.innerWidth > window.innerHeight
+          // iOS: Usar pseudo-fullscreen con CSS + dimensiones JavaScript
+          const width = window.innerWidth
+          const height = window.innerHeight
+          const isLandscape = width > height
+
           videoContainerRef.current.setAttribute('data-orientation', isLandscape ? 'landscape' : 'portrait')
           videoContainerRef.current.classList.add('pseudo-fullscreen')
+
+          // Setear dimensiones explícitas con JavaScript para iOS
+          videoContainerRef.current.style.width = `${width}px`
+          videoContainerRef.current.style.height = `${height}px`
+
+          const playerContainer = videoContainerRef.current.querySelector('.relative') as HTMLElement
+          if (playerContainer) {
+            playerContainer.style.width = `${width}px`
+            playerContainer.style.height = `${height}px`
+          }
+
+          const player = videoContainerRef.current.querySelector('#player') as HTMLElement
+          if (player) {
+            player.style.width = `${width}px`
+            player.style.height = `${height}px`
+          }
+
           setIsFullscreen(true)
           document.body.style.overflow = 'hidden'
         } else {
@@ -361,9 +381,26 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
         }
       } else {
         if (isIOS) {
-          // iOS: Salir de pseudo-fullscreen
+          // iOS: Salir de pseudo-fullscreen y limpiar estilos
           videoContainerRef.current.classList.remove('pseudo-fullscreen')
           videoContainerRef.current.removeAttribute('data-orientation')
+
+          // Limpiar dimensiones inline
+          videoContainerRef.current.style.width = ''
+          videoContainerRef.current.style.height = ''
+
+          const playerContainer = videoContainerRef.current.querySelector('.relative') as HTMLElement
+          if (playerContainer) {
+            playerContainer.style.width = ''
+            playerContainer.style.height = ''
+          }
+
+          const player = videoContainerRef.current.querySelector('#player') as HTMLElement
+          if (player) {
+            player.style.width = ''
+            player.style.height = ''
+          }
+
           setIsFullscreen(false)
           document.body.style.overflow = ''
         } else {
@@ -456,23 +493,74 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
   }, [isFullscreen])
 
   // Detectar cambios de orientación en iOS durante pseudo-fullscreen
+  // Usar JavaScript para setear dimensiones porque iOS no actualiza bien CSS viewport units
   useEffect(() => {
     if (!isIOS) return
 
-    const handleOrientationChange = () => {
+    const updateDimensions = () => {
       if (isFullscreen && videoContainerRef.current) {
-        // Actualizar orientación cuando el usuario rota el dispositivo
-        const isLandscape = window.innerWidth > window.innerHeight
+        // Forzar recalculo de dimensiones con valores reales de JavaScript
+        const width = window.innerWidth
+        const height = window.innerHeight
+        const isLandscape = width > height
+
         videoContainerRef.current.setAttribute('data-orientation', isLandscape ? 'landscape' : 'portrait')
+
+        // Setear dimensiones explícitas con JavaScript para iOS
+        videoContainerRef.current.style.width = `${width}px`
+        videoContainerRef.current.style.height = `${height}px`
+
+        // También setear en el contenedor del player
+        const playerContainer = videoContainerRef.current.querySelector('.relative') as HTMLElement
+        if (playerContainer) {
+          playerContainer.style.width = `${width}px`
+          playerContainer.style.height = `${height}px`
+        }
+
+        const player = videoContainerRef.current.querySelector('#player') as HTMLElement
+        if (player) {
+          player.style.width = `${width}px`
+          player.style.height = `${height}px`
+        }
       }
     }
 
-    window.addEventListener('orientationchange', handleOrientationChange)
-    window.addEventListener('resize', handleOrientationChange)
+    // Ejecutar inmediatamente si ya estamos en fullscreen
+    if (isFullscreen) {
+      updateDimensions()
+    }
+
+    // Usar múltiples eventos para capturar cambios de orientación en iOS
+    window.addEventListener('orientationchange', updateDimensions)
+    window.addEventListener('resize', updateDimensions)
+
+    // iOS a veces necesita un pequeño delay después del orientationchange
+    const handleOrientationWithDelay = () => {
+      setTimeout(updateDimensions, 100)
+      setTimeout(updateDimensions, 300)
+    }
+    window.addEventListener('orientationchange', handleOrientationWithDelay)
 
     return () => {
-      window.removeEventListener('orientationchange', handleOrientationChange)
-      window.removeEventListener('resize', handleOrientationChange)
+      window.removeEventListener('orientationchange', updateDimensions)
+      window.removeEventListener('resize', updateDimensions)
+      window.removeEventListener('orientationchange', handleOrientationWithDelay)
+
+      // Limpiar estilos inline al desmontar
+      if (videoContainerRef.current) {
+        videoContainerRef.current.style.width = ''
+        videoContainerRef.current.style.height = ''
+        const playerContainer = videoContainerRef.current.querySelector('.relative') as HTMLElement
+        if (playerContainer) {
+          playerContainer.style.width = ''
+          playerContainer.style.height = ''
+        }
+        const player = videoContainerRef.current.querySelector('#player') as HTMLElement
+        if (player) {
+          player.style.width = ''
+          player.style.height = ''
+        }
+      }
     }
   }, [isIOS, isFullscreen])
 
