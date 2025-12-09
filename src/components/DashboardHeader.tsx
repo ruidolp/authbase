@@ -38,7 +38,7 @@ export function DashboardHeader({ userName, familySlug }: DashboardHeaderProps) 
         className={cn(!familySlug && "pointer-events-none opacity-60")}
       >
         <Link href={tvHref} aria-disabled={!familySlug} tabIndex={familySlug ? undefined : -1}>
-          <Tv className="h-4 w-4" />
+          <Tv className="h-4 w-4 text-rose-600" />
           <span className="ml-2 text-xs font-medium uppercase sm:text-sm">Ver TV</span>
         </Link>
       </Button>
