@@ -153,10 +153,28 @@
   /* Fondo liso para estados de fullscreen - incluye html para PWA */
   html.fullscreen-active,
   html.fullscreen-active body,
-  body.fullscreen-active {
+  body.fullscreen-active,
+  html[data-fullscreen="true"],
+  html[data-fullscreen="true"] body {
     background: #000 !important;
     background-image: none !important;
     background-color: #000 !important;
+  }
+
+  /* Forzar color de barra de estado en Android */
+  @supports (-webkit-touch-callout: none) {
+    html[data-fullscreen="true"]::before,
+    html.fullscreen-active::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: env(safe-area-inset-top, 0);
+      background: #000 !important;
+      z-index: 999999;
+      pointer-events: none;
+    }
   }
 
   /* Relleno de la zona segura en PWA iOS/Android para tintar el área del sistema */

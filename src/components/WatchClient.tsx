@@ -349,9 +349,11 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
           setIsFullscreen(true)
           document.body.style.overflow = 'hidden'
         } else {
-          // Android/Desktop: Fullscreen API nativa
+          // Android/Desktop: Fullscreen API nativa con opciones para ocultar navegación
+          const fullscreenOptions = { navigationUI: "hide" as const }
+
           if (videoContainerRef.current.requestFullscreen) {
-            await videoContainerRef.current.requestFullscreen()
+            await videoContainerRef.current.requestFullscreen(fullscreenOptions)
           } else if (videoContainerRef.current.webkitRequestFullscreen) {
             await videoContainerRef.current.webkitRequestFullscreen()
           } else if (videoContainerRef.current.mozRequestFullScreen) {
@@ -451,17 +453,49 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
 
     meta.setAttribute("content", themeColor)
 
-    // También actualizar status bar en Android
-    const statusBarMeta = document.querySelector('meta[name="mobile-web-app-status-bar-style"]') as HTMLMetaElement | null
-    if (statusBarMeta) {
-      statusBarMeta.setAttribute("content", isFullscreen ? "black" : "default")
-    }
-
-    // Forzar actualización del tema en Android
+    // Forzar actualización del tema en Android y todo el documento
     if (isFullscreen) {
-      document.documentElement.style.setProperty('background-color', '#000000')
+      // Forzar color negro en todo el documento
+      document.documentElement.style.setProperty('background-color', '#000000', 'important')
+      document.documentElement.style.setProperty('background', '#000000', 'important')
+      document.body.style.setProperty('background-color', '#000000', 'important')
+      document.body.style.setProperty('background', '#000000', 'important')
+
+      // Agregar clase al html para forzar estilos adicionales
+      document.documentElement.setAttribute('data-fullscreen', 'true')
+
+      // Crear o actualizar meta tags adicionales para Android
+      let androidStatusBar = document.querySelector('meta[name="mobile-web-app-status-bar-style"]') as HTMLMetaElement | null
+      if (!androidStatusBar) {
+        androidStatusBar = document.createElement("meta")
+        androidStatusBar.name = "mobile-web-app-status-bar-style"
+        document.head.appendChild(androidStatusBar)
+      }
+      androidStatusBar.setAttribute("content", "black-translucent")
+
+      // Meta tag adicional para iOS
+      let appleStatusBar = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]') as HTMLMetaElement | null
+      if (appleStatusBar) {
+        appleStatusBar.setAttribute("content", "black-translucent")
+      }
     } else {
+      // Restaurar colores normales
       document.documentElement.style.removeProperty('background-color')
+      document.documentElement.style.removeProperty('background')
+      document.body.style.removeProperty('background-color')
+      document.body.style.removeProperty('background')
+      document.documentElement.removeAttribute('data-fullscreen')
+
+      // Restaurar meta tags
+      const androidStatusBar = document.querySelector('meta[name="mobile-web-app-status-bar-style"]') as HTMLMetaElement | null
+      if (androidStatusBar) {
+        androidStatusBar.setAttribute("content", "default")
+      }
+
+      const appleStatusBar = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]') as HTMLMetaElement | null
+      if (appleStatusBar) {
+        appleStatusBar.setAttribute("content", "black-translucent")
+      }
     }
 
     return () => {
@@ -470,6 +504,10 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
         currentMeta.setAttribute("content", DEFAULT_THEME_COLOR)
       }
       document.documentElement.style.removeProperty('background-color')
+      document.documentElement.style.removeProperty('background')
+      document.body.style.removeProperty('background-color')
+      document.body.style.removeProperty('background')
+      document.documentElement.removeAttribute('data-fullscreen')
     }
   }, [isFullscreen])
 

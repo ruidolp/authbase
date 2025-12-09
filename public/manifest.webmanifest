@@ -3,9 +3,11 @@
   "short_name": "CamiSOL TV",
   "description": "CamiSOL TV — acceso facil y seguro en tu PWA.",
   "start_url": "/",
-  "display": "standalone",
-  "background_color": "#fff7ed",
-  "theme_color": "#fff7ed",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "any",
   "icons": [
     {
       "src": "/camisol-icon-192.png",

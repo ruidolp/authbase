@@ -42,6 +42,9 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta name="theme-color" content="#fff7ed" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
       <body className="antialiased">
         <SessionProvider>
