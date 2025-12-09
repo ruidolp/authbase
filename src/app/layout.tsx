@@ -5,11 +5,6 @@ import SessionProvider from "@/components/SessionProvider";
 export const metadata: Metadata = {
   title: "CamiSOL TV",
   description: "Accede a CamiSOL TV facilmente desde tu PWA.",
-  themeColor: [
-    { media: "(display-mode: standalone)", color: "#000000" },
-    { media: "(display-mode: fullscreen)", color: "#000000" },
-    { color: "#fff7ed" },
-  ],
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
@@ -45,6 +40,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="theme-color" content="#fff7ed" />
+      </head>
       <body className="antialiased">
         <SessionProvider>
           {children}

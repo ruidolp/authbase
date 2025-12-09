@@ -20,7 +20,7 @@ export function DashboardHeader({ userName, familySlug }: DashboardHeaderProps) 
   const tvHref = familySlug ? `/watch/${familySlug}` : "/watch"
 
   return (
-    <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
+    <header className="header-with-safe-area sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
       <div className="flex flex-1 items-center gap-2">
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="h-6" />

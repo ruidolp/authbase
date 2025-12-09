@@ -439,7 +439,9 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
   // Ajustar meta theme-color para PWA cuando estamos en fullscreen
   useEffect(() => {
     const themeColor = isFullscreen ? "#000000" : DEFAULT_THEME_COLOR
-    let meta = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null
+
+    // Actualizar o crear el meta tag principal
+    let meta = document.querySelector('meta[name="theme-color"]:not([media])') as HTMLMetaElement | null
 
     if (!meta) {
       meta = document.createElement("meta")
@@ -449,11 +451,25 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
 
     meta.setAttribute("content", themeColor)
 
+    // También actualizar status bar en Android
+    const statusBarMeta = document.querySelector('meta[name="mobile-web-app-status-bar-style"]') as HTMLMetaElement | null
+    if (statusBarMeta) {
+      statusBarMeta.setAttribute("content", isFullscreen ? "black" : "default")
+    }
+
+    // Forzar actualización del tema en Android
+    if (isFullscreen) {
+      document.documentElement.style.setProperty('background-color', '#000000')
+    } else {
+      document.documentElement.style.removeProperty('background-color')
+    }
+
     return () => {
-      const currentMeta = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null
+      const currentMeta = document.querySelector('meta[name="theme-color"]:not([media])') as HTMLMetaElement | null
       if (currentMeta) {
         currentMeta.setAttribute("content", DEFAULT_THEME_COLOR)
       }
+      document.documentElement.style.removeProperty('background-color')
     }
   }, [isFullscreen])
 

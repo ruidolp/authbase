@@ -137,6 +137,14 @@
     -webkit-overflow-scrolling: touch;
   }
 
+  /* Safe area para el header en iOS */
+  @supports (padding: env(safe-area-inset-top)) {
+    .header-with-safe-area {
+      padding-top: env(safe-area-inset-top);
+      top: 0;
+    }
+  }
+
   /* Prevenir zoom en inputs en iOS - font-size >= 16px evita el zoom */
   input, textarea, select {
     font-size: 16px !important;
