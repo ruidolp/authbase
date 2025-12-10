@@ -170,6 +170,34 @@
     overflow: hidden !important;
   }
 
+  /* CRÍTICO Android PWA: Cuando HAY fullscreen nativo, pintar html/body de negro */
+  html:fullscreen,
+  html:-webkit-full-screen,
+  html:-moz-full-screen,
+  html:-ms-fullscreen,
+  body:fullscreen,
+  body:-webkit-full-screen,
+  body:-moz-full-screen,
+  body:-ms-fullscreen {
+    background: #000 !important;
+    background-color: #000 !important;
+    background-image: none !important;
+  }
+
+  /* Cuando el documento tiene un elemento en fullscreen, pintar todo de negro */
+  html:has(:fullscreen),
+  html:has(:-webkit-full-screen),
+  html:has(:-moz-full-screen),
+  html:has(:-ms-fullscreen),
+  body:has(:fullscreen),
+  body:has(:-webkit-full-screen),
+  body:has(:-moz-full-screen),
+  body:has(:-ms-fullscreen) {
+    background: #000 !important;
+    background-color: #000 !important;
+    background-image: none !important;
+  }
+
   /* Forzar color de barra de estado en Android */
   @supports (-webkit-touch-callout: none) {
     html[data-fullscreen="true"]::before,
@@ -517,11 +545,20 @@
 }
 
 /* Ajustar el contenedor de video en fullscreen */
+/* CRÍTICO para Android PWA: Forzar fondo negro en el elemento fullscreen */
 :fullscreen,
 :-webkit-full-screen,
 :-moz-full-screen,
 :-ms-fullscreen {
-  background: black;
+  background: #000 !important;
+  background-color: #000 !important;
+  /* Asegurar que ocupe todo el viewport incluyendo área de navegación */
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 /* Asegurar que el video ocupe toda la pantalla en fullscreen */

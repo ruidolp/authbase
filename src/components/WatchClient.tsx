@@ -79,6 +79,7 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
   const isTrackingRef = useRef(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
+  const [isAndroid, setIsAndroid] = useState(false)
   const [isPWA, setIsPWA] = useState(false)
   const [showControls, setShowControls] = useState(true)
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -89,11 +90,15 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     setDisplayedVideos(shuffleArray([...videos]))
   }, [videos])
 
-  // Detectar iOS y PWA mode
+  // Detectar iOS, Android y PWA mode
   useEffect(() => {
     const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
                 (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
     setIsIOS(ios)
+
+    // Detectar Android
+    const android = /Android/.test(navigator.userAgent)
+    setIsAndroid(android)
 
     // Detectar si estamos en PWA (standalone mode)
     const isPWAMode = window.matchMedia('(display-mode: standalone)').matches ||
@@ -101,7 +106,7 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
                       ('standalone' in window.navigator && (window.navigator as { standalone?: boolean }).standalone === true)
     setIsPWA(isPWAMode)
 
-    console.log('Device detection:', { ios, isPWAMode })
+    console.log('Device detection:', { ios, android, isPWAMode })
   }, [])
 
   useEffect(() => {
@@ -349,10 +354,11 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
 
     try {
       if (!isFullscreen) {
-        // En PWA (iOS o Android) SIEMPRE usamos pseudo-fullscreen
-        // porque la API nativa no cubre el área de navegación del sistema en Android PWA
-        if (isPWA || isIOS) {
-          console.log('Usando pseudo-fullscreen para PWA')
+        // iOS: SIEMPRE usar pseudo-fullscreen (no tiene botones de navegación persistentes)
+        // Android: SIEMPRE usar API nativa (única forma de ocultar botones del sistema)
+        // Desktop: usar API nativa
+        if (isIOS) {
+          console.log('iOS: Usando pseudo-fullscreen')
           const isLandscape = window.innerWidth > window.innerHeight
           videoContainerRef.current.setAttribute('data-orientation', isLandscape ? 'landscape' : 'portrait')
           videoContainerRef.current.classList.add('pseudo-fullscreen')
@@ -360,8 +366,8 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
           setIsFullscreen(true)
           document.body.style.overflow = 'hidden'
         } else {
-          // Browser normal (Chrome mobile, Firefox, etc): Usar API nativa
-          console.log('Usando fullscreen nativo para browser')
+          // Android y Desktop: usar API nativa para ocultar botones/barra del sistema
+          console.log('Android/Desktop: Usando fullscreen nativo')
           const fullscreenOptions = { navigationUI: "hide" as const }
 
           if (videoContainerRef.current.requestFullscreen) {
@@ -375,17 +381,17 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
           }
         }
       } else {
-        if (isPWA || isIOS) {
-          // Salir de pseudo-fullscreen
-          console.log('Saliendo de pseudo-fullscreen')
+        if (isIOS) {
+          // iOS: Salir de pseudo-fullscreen
+          console.log('iOS: Saliendo de pseudo-fullscreen')
           videoContainerRef.current.classList.remove('pseudo-fullscreen')
           videoContainerRef.current.removeAttribute('data-orientation')
 
           setIsFullscreen(false)
           document.body.style.overflow = ''
         } else {
-          // Salir de fullscreen nativo
-          console.log('Saliendo de fullscreen nativo')
+          // Android/Desktop: Salir de fullscreen nativo
+          console.log('Android/Desktop: Saliendo de fullscreen nativo')
           if (document.exitFullscreen) {
             await document.exitFullscreen()
           } else if (document.webkitExitFullscreen) {
@@ -402,10 +408,10 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     }
   }
 
-  // Detectar cambios de fullscreen (solo para browser normal, no PWA ni iOS)
+  // Detectar cambios de fullscreen (para Android y Desktop que usan API nativa)
   useEffect(() => {
-    // En PWA o iOS usamos pseudo-fullscreen, no necesitamos estos listeners
-    if (isPWA || isIOS) return
+    // Solo para dispositivos que usan fullscreen nativo (no iOS)
+    if (isIOS) return
 
     function handleFullscreenChange() {
       const isCurrentlyFullscreen = !!(
@@ -433,7 +439,7 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
       document.removeEventListener('mozfullscreenchange', handleFullscreenChange)
       document.removeEventListener('MSFullscreenChange', handleFullscreenChange)
     }
-  }, [isPWA, isIOS])
+  }, [isIOS])
 
   // Pintar la zona segura en negro cuando estamos en fullscreen (especial PWA)
   // IMPORTANTE: Agregar clase tanto a html como a body para que PWA pinte el safe-area-inset en negro
@@ -526,10 +532,10 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     }
   }, [isFullscreen])
 
-  // Detectar cambios de orientación durante pseudo-fullscreen (PWA y iOS)
+  // Detectar cambios de orientación durante pseudo-fullscreen (solo iOS)
   useEffect(() => {
-    // Solo para PWA o iOS que usan pseudo-fullscreen
-    if (!isPWA && !isIOS) return
+    // Solo para iOS que usa pseudo-fullscreen
+    if (!isIOS) return
 
     const updateOrientation = () => {
       if (isFullscreen && videoContainerRef.current) {
@@ -551,7 +557,7 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
       window.removeEventListener('orientationchange', updateOrientation)
       window.removeEventListener('resize', updateOrientation)
     }
-  }, [isPWA, isIOS, isFullscreen])
+  }, [isIOS, isFullscreen])
 
   // Auto-hide de controles en fullscreen
   useEffect(() => {
