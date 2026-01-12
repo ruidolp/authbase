@@ -10,6 +10,7 @@ interface Video {
   video_id: string
   nombre: string
   url: string
+  videoType?: string // "youtube" o "drive"
 }
 
 interface VideoCardProps {
@@ -55,21 +56,39 @@ export function VideoCard({ video, onVideoDeleted }: VideoCardProps) {
   return (
     <div className="video-card rounded-xl overflow-hidden w-full backdrop-blur-sm">
       <div className="video-thumbnail relative w-full h-36 md:h-40 bg-gray-100">
-        <Image
-          src={`https://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg`}
-          alt={video.nombre}
-          fill
-          priority={false}
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, 33vw"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement
-            target.src = `https://img.youtube.com/vi/${video.video_id}/hqdefault.jpg`
-          }}
-        />
-        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-          <Play className="w-10 h-10 text-white" fill="white" />
-        </div>
+        {video.videoType === 'drive' ? (
+          // Thumbnail de Google Drive
+          <>
+            <Image
+              src={`https://drive.google.com/thumbnail?id=${video.video_id}&sz=w400`}
+              alt={video.nombre}
+              fill
+              priority={false}
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 33vw"
+              unoptimized
+            />
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+              <Play className="w-10 h-10 text-white" fill="white" />
+            </div>
+          </>
+        ) : (
+          // Miniatura de YouTube
+          <>
+            <Image
+              src={`https://img.youtube.com/vi/${video.video_id}/hqdefault.jpg`}
+              alt={video.nombre}
+              fill
+              priority={false}
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 33vw"
+              unoptimized
+            />
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+              <Play className="w-10 h-10 text-white" fill="white" />
+            </div>
+          </>
+        )}
       </div>
 
       <div className="p-3 md:p-4">

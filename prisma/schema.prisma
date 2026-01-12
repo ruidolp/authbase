@@ -113,18 +113,19 @@ model FamilyInvitation {
 // ============================================
 
 model Video {
-  id        Int      @id @default(autoincrement())
-  video_id  String   @unique @map("video_id")
-  nombre    String
-  url       String
-  
-  familyId  String   @map("family_id")
-  family    Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
-  
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
-  
-  watchSessions WatchSession[]
-  
+  id             Int      @id @default(autoincrement())
+  video_id       String   @unique @map("video_id")
+  nombre         String
+  url            String
+  videoType      String   @default("youtube") @map("video_type") // "youtube" o "drive"
+
+  familyId       String   @map("family_id")
+  family         Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  watchSessions  WatchSession[]
+
   @@map("videos")
 }
 

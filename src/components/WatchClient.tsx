@@ -12,6 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { LocalVideoPlayer } from "@/components/LocalVideoPlayer"
 
 declare global {
   interface Window {
@@ -47,6 +48,7 @@ interface Video {
   video_id: string
   nombre: string
   url: string
+  videoType: string // "youtube" o "drive"
 }
 
 interface WatchClientProps {
@@ -58,6 +60,13 @@ interface WatchClientProps {
 }
 
 const DEFAULT_THEME_COLOR = "#fff7ed"
+
+// Función para convertir URL de Google Drive a URL de proxy
+// IMPORTANTE: El video debe estar compartido como "Anyone with the link can view"
+function getDriveProxyUrl(videoId: string): string {
+  // Usamos nuestro endpoint proxy que maneja la descarga de Drive
+  return `/api/drive-proxy?id=${videoId}`
+}
 
 export function WatchClient({ familyId, initialVideos, userRole, familySlug }: WatchClientProps) {
   const { data: session } = useSession()
@@ -109,8 +118,12 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     console.log('Device detection:', { ios, android, isPWAMode })
   }, [])
 
+  // Inicializar YouTube Player solo para videos de YouTube
   useEffect(() => {
     if (displayedVideos.length === 0) return
+
+    const currentVideo = displayedVideos[currentIndex]
+    if (!currentVideo || currentVideo.videoType !== 'youtube') return
 
     function onPlayerStateChange(event: { data: number }) {
       if (displayedVideos.length === 0) return
@@ -141,13 +154,13 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
         return
       }
 
-      console.log('Inicializando player con video:', displayedVideos[0].video_id)
-      
+      console.log('Inicializando player con video:', displayedVideos[currentIndex].video_id)
+
       try {
         playerRef.current = new window.YT.Player("player", {
           height: "100%",
           width: "100%",
-          videoId: displayedVideos[0].video_id,
+          videoId: displayedVideos[currentIndex].video_id,
           playerVars: {
             autoplay: 1,
             controls: 1,
@@ -179,9 +192,9 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
       initPlayer()
     } else {
       console.log('Cargando script de YouTube API')
-      
+
       const existingScript = document.querySelector('script[src="https://www.youtube.com/iframe_api"]')
-      
+
       if (!existingScript) {
         const tag = document.createElement("script")
         tag.src = "https://www.youtube.com/iframe_api"
@@ -202,7 +215,20 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [displayedVideos])
+  }, [displayedVideos, currentIndex])
+
+  // Cargar nuevo video cuando cambia currentIndex (solo para YouTube)
+  useEffect(() => {
+    if (displayedVideos.length === 0) return
+
+    const currentVideo = displayedVideos[currentIndex]
+    if (!currentVideo || currentVideo.videoType !== 'youtube') return
+
+    if (!playerRef.current?.loadVideoById) return
+
+    console.log('Cargando nuevo video de YouTube:', currentVideo.video_id)
+    playerRef.current.loadVideoById(currentVideo.video_id)
+  }, [currentIndex, displayedVideos])
 
   function shuffleArray(array: Video[]) {
     const shuffled = [...array]
@@ -285,9 +311,6 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     if (displayedVideos.length === 0) return
     const nextIndex = (currentIndex + 1) % displayedVideos.length
     setCurrentIndex(nextIndex)
-    if (playerRef.current?.loadVideoById) {
-      playerRef.current.loadVideoById(displayedVideos[nextIndex].video_id)
-    }
     scrollToTop()
   }
 
@@ -295,15 +318,14 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     if (isTrackingRef.current) {
       endWatchSession(false)
     }
-    
+
     setCurrentIndex(index)
     scrollToTop()
-    
-    if (playerRef.current?.loadVideoById) {
-      console.log('Cargando video:', displayedVideos[index].video_id)
-      playerRef.current.loadVideoById(displayedVideos[index].video_id)
-    } else {
-      console.error('Player no disponible para cargar video')
+
+    const video = displayedVideos[index]
+    if (video.videoType === 'youtube' && playerRef.current?.loadVideoById) {
+      console.log('Cargando video:', video.video_id)
+      playerRef.current.loadVideoById(video.video_id)
     }
   }
 
@@ -442,7 +464,6 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
   }, [isIOS])
 
   // Pintar la zona segura en negro cuando estamos en fullscreen (especial PWA)
-  // IMPORTANTE: Agregar clase tanto a html como a body para que PWA pinte el safe-area-inset en negro
   useEffect(() => {
     const html = document.documentElement
     if (isFullscreen) {
@@ -788,40 +809,69 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
         <div ref={videoContainerRef} className="w-full">
           <div className="bg-black overflow-hidden mb-1 w-full">
             <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-              <div
-                id="player"
-                className="absolute top-0 left-0 w-full h-full"
-              ></div>
-              {/* Overlay para bloquear el título en la parte superior */}
-              <div
-                className="youtube-blocker-overlay youtube-blocker-top"
-                onClick={(e) => { e.stopPropagation(); handleShowControls(); }}
-                onTouchStart={(e) => { e.stopPropagation(); handleShowControls(); }}
-              />
-              {/* Overlay para bloquear la barra inferior de YouTube */}
-              <div
-                className="youtube-blocker-overlay youtube-blocker-bottom"
-                onClick={(e) => { e.stopPropagation(); handleShowControls(); }}
-                onTouchStart={(e) => { e.stopPropagation(); handleShowControls(); }}
-              />
-              {/* Overlay adicional para la esquina inferior derecha donde suele estar el logo */}
-              <div
-                className="youtube-blocker-overlay youtube-blocker-corner"
-                onClick={(e) => { e.stopPropagation(); handleShowControls(); }}
-                onTouchStart={(e) => { e.stopPropagation(); handleShowControls(); }}
-              />
-              {/* Botón de fullscreen custom */}
-              <button
-                onClick={toggleFullscreen}
-                className={`fullscreen-button ${showControls ? 'visible' : 'hidden'}`}
-                aria-label={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
-              >
-                {isFullscreen ? (
-                  <Minimize className="w-6 h-6" />
-                ) : (
-                  <Maximize className="w-6 h-6" />
-                )}
-              </button>
+              {currentVideo?.videoType === 'drive' ? (
+                // Reproductor de video nativo para Google Drive con caché
+                <div className="absolute top-0 left-0 w-full h-full">
+                  <LocalVideoPlayer
+                    videoUrl={getDriveProxyUrl(currentVideo.video_id)}
+                    videoId={currentVideo.video_id}
+                    familyId={familyId}
+                    isDriveVideo={true}
+                    onEnded={() => {
+                      endWatchSession(true)
+                      setTimeout(() => playNextVideo(), 1000)
+                    }}
+                    onPlay={() => {
+                      if (!isTrackingRef.current) {
+                        startWatchSession(currentVideo)
+                      } else {
+                        resumeTracking()
+                      }
+                    }}
+                    onPause={() => {
+                      pauseTracking()
+                    }}
+                  />
+                </div>
+              ) : (
+                // Reproductor de YouTube
+                <>
+                  <div
+                    id="player"
+                    className="absolute top-0 left-0 w-full h-full"
+                  ></div>
+                  {/* Overlay para bloquear el título en la parte superior */}
+                  <div
+                    className="youtube-blocker-overlay youtube-blocker-top"
+                    onClick={(e) => { e.stopPropagation(); handleShowControls(); }}
+                    onTouchStart={(e) => { e.stopPropagation(); handleShowControls(); }}
+                  />
+                  {/* Overlay para bloquear la barra inferior de YouTube */}
+                  <div
+                    className="youtube-blocker-overlay youtube-blocker-bottom"
+                    onClick={(e) => { e.stopPropagation(); handleShowControls(); }}
+                    onTouchStart={(e) => { e.stopPropagation(); handleShowControls(); }}
+                  />
+                  {/* Overlay adicional para la esquina inferior derecha donde suele estar el logo */}
+                  <div
+                    className="youtube-blocker-overlay youtube-blocker-corner"
+                    onClick={(e) => { e.stopPropagation(); handleShowControls(); }}
+                    onTouchStart={(e) => { e.stopPropagation(); handleShowControls(); }}
+                  />
+                  {/* Botón de fullscreen custom */}
+                  <button
+                    onClick={toggleFullscreen}
+                    className={`fullscreen-button ${showControls ? 'visible' : 'hidden'}`}
+                    aria-label={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+                  >
+                    {isFullscreen ? (
+                      <Minimize className="w-6 h-6" />
+                    ) : (
+                      <Maximize className="w-6 h-6" />
+                    )}
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -860,14 +910,25 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
                     }`}
                   >
                     <div className="relative w-24 sm:w-28 h-14 sm:h-16 flex-shrink-0">
-                      <Image
-                        src={`https://img.youtube.com/vi/${video.video_id}/mqdefault.jpg`}
-                        alt={video.nombre}
-                        fill
-                        className="object-cover rounded"
-                        sizes="(max-width: 640px) 96px, 112px"
-                        unoptimized
-                      />
+                      {video.videoType === 'youtube' ? (
+                        <Image
+                          src={`https://img.youtube.com/vi/${video.video_id}/mqdefault.jpg`}
+                          alt={video.nombre}
+                          fill
+                          className="object-cover rounded"
+                          sizes="(max-width: 640px) 96px, 112px"
+                          unoptimized
+                        />
+                      ) : (
+                        <Image
+                          src={`https://drive.google.com/thumbnail?id=${video.video_id}&sz=w200`}
+                          alt={video.nombre}
+                          fill
+                          className="object-cover rounded"
+                          sizes="(max-width: 640px) 96px, 112px"
+                          unoptimized
+                        />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3

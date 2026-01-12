@@ -10,6 +10,7 @@ interface Video {
   video_id: string
   nombre: string
   url: string
+  videoType?: string // "youtube" o "drive"
   created_at: string
 }
 

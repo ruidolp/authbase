@@ -2,18 +2,11 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 
-// Función helper para extraer videoId de YouTube
-function extractVideoId(url: string): string | null {
-  const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
-  const match = url.match(regExp)
-  return (match && match[7].length === 11) ? match[7] : null
-}
-
 // GET - Listar videos de la familia
 export async function GET() {
   try {
     const session = await auth()
-    
+
     if (!session?.user?.familyId) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
@@ -38,22 +31,24 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const session = await auth()
-    
+
     if (!session?.user?.familyId) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
 
     const body = await request.json()
-    const { nombre, url } = body
+    const { nombre, url, videoType, videoId } = body
 
     if (!nombre || !url) {
       return NextResponse.json({ error: "Nombre y URL son requeridos" }, { status: 400 })
     }
 
-    // Extraer y validar videoId de YouTube
-    const videoId = extractVideoId(url)
-    if (!videoId) {
-      return NextResponse.json({ error: "URL de YouTube inválida" }, { status: 400 })
+    if (!videoType || !videoId) {
+      return NextResponse.json({ error: "Tipo de video y ID son requeridos" }, { status: 400 })
+    }
+
+    if (videoType !== 'youtube' && videoType !== 'drive') {
+      return NextResponse.json({ error: "Tipo de video inválido" }, { status: 400 })
     }
 
     // Verificar si el video ya existe en esta familia
@@ -74,6 +69,7 @@ export async function POST(request: Request) {
         video_id: videoId,
         nombre,
         url,
+        videoType,
         familyId: session.user.familyId
       }
     })
