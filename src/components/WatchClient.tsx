@@ -61,13 +61,6 @@ interface WatchClientProps {
 
 const DEFAULT_THEME_COLOR = "#fff7ed"
 
-// Función para convertir URL de Google Drive a URL de proxy
-// IMPORTANTE: El video debe estar compartido como "Anyone with the link can view"
-function getDriveProxyUrl(videoId: string): string {
-  // Usamos nuestro endpoint proxy que maneja la descarga de Drive
-  return `/api/drive-proxy?id=${videoId}`
-}
-
 export function WatchClient({ familyId, initialVideos, userRole, familySlug }: WatchClientProps) {
   const { data: session } = useSession()
   const [videos] = useState<Video[]>(initialVideos)
@@ -88,8 +81,6 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
   const isTrackingRef = useRef(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
-  const [isAndroid, setIsAndroid] = useState(false)
-  const [isPWA, setIsPWA] = useState(false)
   const [showControls, setShowControls] = useState(true)
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const observerRef = useRef<IntersectionObserver | null>(null)
@@ -99,23 +90,13 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     setDisplayedVideos(shuffleArray([...videos]))
   }, [videos])
 
-  // Detectar iOS, Android y PWA mode
+  // Detectar iOS
   useEffect(() => {
     const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
                 (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
     setIsIOS(ios)
 
-    // Detectar Android
-    const android = /Android/.test(navigator.userAgent)
-    setIsAndroid(android)
-
-    // Detectar si estamos en PWA (standalone mode)
-    const isPWAMode = window.matchMedia('(display-mode: standalone)').matches ||
-                      window.matchMedia('(display-mode: fullscreen)').matches ||
-                      ('standalone' in window.navigator && (window.navigator as { standalone?: boolean }).standalone === true)
-    setIsPWA(isPWAMode)
-
-    console.log('Device detection:', { ios, android, isPWAMode })
+    console.log('Device detection:', { ios })
   }, [])
 
   // Inicializar YouTube Player solo para videos de YouTube
@@ -813,10 +794,8 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
                 // Reproductor de video nativo para Google Drive con caché
                 <div className="absolute top-0 left-0 w-full h-full">
                   <LocalVideoPlayer
-                    videoUrl={getDriveProxyUrl(currentVideo.video_id)}
                     videoId={currentVideo.video_id}
                     familyId={familyId}
-                    isDriveVideo={true}
                     onEnded={() => {
                       endWatchSession(true)
                       setTimeout(() => playNextVideo(), 1000)

@@ -154,7 +154,7 @@ export function VideoForm({ onVideoAdded }: VideoFormProps) {
           <div className="bg-blue-50 border border-blue-200 text-blue-800 px-3 md:px-4 py-2 md:py-3 rounded text-xs md:text-sm">
             <p className="font-medium mb-1">Video de Google Drive detectado</p>
             <p className="text-xs">
-              <strong>Importante:</strong> El video debe estar compartido como "Cualquier persona con el enlace" para que se pueda ver.
+              <strong>Importante:</strong> El video debe estar compartido como &quot;Cualquier persona con el enlace&quot; para que se pueda ver.
             </p>
           </div>
         )}

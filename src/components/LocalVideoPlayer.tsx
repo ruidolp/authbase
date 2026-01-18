@@ -4,20 +4,16 @@ import { useEffect, useRef, useState } from "react"
 import { videoCache, downloadVideo, validateVideoAccess } from "@/lib/videoCache"
 
 interface LocalVideoPlayerProps {
-  videoUrl: string
   videoId: string // ID del video en Drive
   familyId: string // ID de la familia
-  isDriveVideo?: boolean
   onEnded?: () => void
   onPlay?: () => void
   onPause?: () => void
 }
 
 export function LocalVideoPlayer({
-  videoUrl,
   videoId,
   familyId,
-  isDriveVideo = false,
   onEnded,
   onPlay,
   onPause
@@ -27,7 +23,6 @@ export function LocalVideoPlayer({
   const [loading, setLoading] = useState(true)
   const [downloadProgress, setDownloadProgress] = useState(0)
   const [isDownloading, setIsDownloading] = useState(false)
-  const [videoBlob, setVideoBlob] = useState<string | null>(null)
 
   useEffect(() => {
     let objectUrl: string | null = null
@@ -59,7 +54,6 @@ export function LocalVideoPlayer({
           // Video encontrado en cache - reproducir inmediatamente
           console.log('[LocalVideoPlayer] Video found in cache, playing immediately')
           objectUrl = URL.createObjectURL(cachedBlob)
-          setVideoBlob(objectUrl)
 
           if (videoRef.current) {
             videoRef.current.src = objectUrl
@@ -81,7 +75,6 @@ export function LocalVideoPlayer({
 
           // Reproducir el video descargado
           objectUrl = URL.createObjectURL(blob)
-          setVideoBlob(objectUrl)
 
           if (videoRef.current) {
             videoRef.current.src = objectUrl

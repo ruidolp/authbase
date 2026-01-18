@@ -259,7 +259,7 @@ export async function downloadVideo(
   }
 
   const reader = response.body.getReader()
-  const chunks: Uint8Array[] = []
+  const chunks: BlobPart[] = []
   let received = 0
 
   while (true) {
