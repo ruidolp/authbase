@@ -290,8 +290,11 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
 
   function playNextVideo() {
     if (displayedVideos.length === 0) return
-    const nextIndex = (currentIndex + 1) % displayedVideos.length
-    setCurrentIndex(nextIndex)
+    setCurrentIndex((prevIndex) => {
+      const nextIndex = (prevIndex + 1) % displayedVideos.length
+      console.log(`[playNextVideo] Changing from index ${prevIndex} to ${nextIndex}`)
+      return nextIndex
+    })
     scrollToTop()
   }
 
