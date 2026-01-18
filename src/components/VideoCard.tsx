@@ -10,7 +10,8 @@ interface Video {
   video_id: string
   nombre: string
   url: string
-  videoType?: string // "youtube" o "drive"
+  videoType?: string // "youtube", "drive" o "github"
+  thumbnailId?: string | null // ID de video de YouTube para thumbnail
 }
 
 interface VideoCardProps {
@@ -68,6 +69,28 @@ export function VideoCard({ video, onVideoDeleted }: VideoCardProps) {
               sizes="(max-width: 768px) 100vw, 33vw"
               unoptimized
             />
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+              <Play className="w-10 h-10 text-white" fill="white" />
+            </div>
+          </>
+        ) : video.videoType === 'github' ? (
+          // Thumbnail para videos de GitHub (usa YouTube si hay thumbnailId)
+          <>
+            {video.thumbnailId ? (
+              <Image
+                src={`https://img.youtube.com/vi/${video.thumbnailId}/hqdefault.jpg`}
+                alt={video.nombre}
+                fill
+                priority={false}
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 33vw"
+                unoptimized
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                <Play className="w-10 h-10 text-gray-400" />
+              </div>
+            )}
             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
               <Play className="w-10 h-10 text-white" fill="white" />
             </div>

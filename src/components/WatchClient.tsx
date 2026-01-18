@@ -48,6 +48,7 @@ interface Video {
   nombre: string
   url: string
   videoType: string // "youtube" o "github"
+  thumbnailId?: string | null // ID de video de YouTube para thumbnail
 }
 
 interface WatchClientProps {
@@ -901,6 +902,15 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
                       {video.videoType === 'youtube' ? (
                         <Image
                           src={`https://img.youtube.com/vi/${video.video_id}/mqdefault.jpg`}
+                          alt={video.nombre}
+                          fill
+                          className="object-cover rounded"
+                          sizes="(max-width: 640px) 96px, 112px"
+                          unoptimized
+                        />
+                      ) : video.thumbnailId ? (
+                        <Image
+                          src={`https://img.youtube.com/vi/${video.thumbnailId}/mqdefault.jpg`}
                           alt={video.nombre}
                           fill
                           className="object-cover rounded"

@@ -38,6 +38,7 @@ function detectVideoType(url: string): { type: 'youtube' | 'github' | null, vide
 export function VideoForm({ onVideoAdded }: VideoFormProps) {
   const [nombre, setNombre] = useState("")
   const [url, setUrl] = useState("")
+  const [thumbnailUrl, setThumbnailUrl] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [detectedType, setDetectedType] = useState<'youtube' | 'github' | null>(null)
@@ -47,6 +48,10 @@ export function VideoForm({ onVideoAdded }: VideoFormProps) {
     setUrl(newUrl)
     const { type } = detectVideoType(newUrl.trim())
     setDetectedType(type)
+    // Limpiar thumbnail si ya no es GitHub
+    if (type !== 'github') {
+      setThumbnailUrl("")
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -70,6 +75,16 @@ export function VideoForm({ onVideoAdded }: VideoFormProps) {
       return
     }
 
+    // Para videos de GitHub, extraer el ID del video de YouTube para thumbnail
+    let thumbnailId: string | null = null
+    if (type === 'github' && thumbnailUrl.trim()) {
+      thumbnailId = extractYouTubeVideoId(thumbnailUrl.trim())
+      if (!thumbnailId) {
+        setError("La URL del thumbnail debe ser de YouTube")
+        return
+      }
+    }
+
     setLoading(true)
 
     try {
@@ -80,7 +95,8 @@ export function VideoForm({ onVideoAdded }: VideoFormProps) {
           nombre: nombre.trim(),
           url: url.trim(),
           videoType: type,
-          videoId: videoId
+          videoId: videoId,
+          thumbnailId: thumbnailId
         }),
       })
 
@@ -92,6 +108,8 @@ export function VideoForm({ onVideoAdded }: VideoFormProps) {
 
       setNombre("")
       setUrl("")
+      setThumbnailUrl("")
+      setDetectedType(null)
       onVideoAdded()
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -137,10 +155,28 @@ export function VideoForm({ onVideoAdded }: VideoFormProps) {
           />
         </div>
 
-        {/* Info para videos de GitHub */}
+        {/* Campo de thumbnail para videos de GitHub */}
         {detectedType === 'github' && (
-          <div className="bg-green-50 border border-green-200 text-green-800 px-3 md:px-4 py-2 md:py-3 rounded text-xs md:text-sm">
-            <p className="font-medium">Video de GitHub detectado</p>
+          <div className="space-y-2">
+            <div className="bg-green-50 border border-green-200 text-green-800 px-3 md:px-4 py-2 md:py-3 rounded text-xs md:text-sm">
+              <p className="font-medium">Video de GitHub detectado</p>
+            </div>
+            <div>
+              <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">
+                URL de YouTube para thumbnail (opcional)
+              </label>
+              <Input
+                type="url"
+                value={thumbnailUrl}
+                onChange={(e) => setThumbnailUrl(e.target.value)}
+                placeholder="https://www.youtube.com/watch?v=..."
+                className="w-full font-mono text-xs md:text-sm"
+                disabled={loading}
+              />
+              <p className="text-gray-500 text-xs mt-1">
+                Pega una URL de YouTube para usar su miniatura como thumbnail
+              </p>
+            </div>
           </div>
         )}
 

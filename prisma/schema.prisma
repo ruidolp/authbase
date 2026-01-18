@@ -117,7 +117,8 @@ model Video {
   video_id       String   @unique @map("video_id")
   nombre         String
   url            String
-  videoType      String   @default("youtube") @map("video_type") // "youtube" o "drive"
+  videoType      String   @default("youtube") @map("video_type") // "youtube", "drive" o "github"
+  thumbnailId    String?  @map("thumbnail_id") // ID de video de YouTube para thumbnail (usado en videos de GitHub)
 
   familyId       String   @map("family_id")
   family         Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)

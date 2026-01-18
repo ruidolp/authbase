@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { nombre, url, videoType, videoId } = body
+    const { nombre, url, videoType, videoId, thumbnailId } = body
 
     if (!nombre || !url) {
       return NextResponse.json({ error: "Nombre y URL son requeridos" }, { status: 400 })
@@ -70,6 +70,7 @@ export async function POST(request: Request) {
         nombre,
         url,
         videoType,
+        thumbnailId: thumbnailId || null,
         familyId: session.user.familyId
       }
     })
