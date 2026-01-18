@@ -2,7 +2,7 @@
   "name": "CamiSOL TV",
   "short_name": "CamiSOL TV",
   "description": "CamiSOL TV — acceso facil y seguro en tu PWA.",
-  "start_url": "/",
+  "start_url": "/watch/camilo",
   "display": "standalone",
   "display_override": ["standalone", "fullscreen"],
   "background_color": "#fff7ed",

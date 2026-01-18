@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Tipo de video y ID son requeridos" }, { status: 400 })
     }
 
-    if (videoType !== 'youtube' && videoType !== 'drive') {
+    if (videoType !== 'youtube' && videoType !== 'drive' && videoType !== 'github') {
       return NextResponse.json({ error: "Tipo de video inválido" }, { status: 400 })
     }
 
