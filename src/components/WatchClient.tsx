@@ -81,6 +81,8 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
   const accumulatedSecondsRef = useRef(0)
   const isTrackingRef = useRef(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const wantsFullscreenRef = useRef(false) // Guarda la intención del usuario de estar en fullscreen
+  const isVideoTransitionRef = useRef(false) // Flag para indicar que estamos cambiando de video
   const [isIOS, setIsIOS] = useState(false)
   const [showControls, setShowControls] = useState(true)
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -211,6 +213,46 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     console.log('Cargando nuevo video de YouTube:', currentVideo.video_id)
     playerRef.current.loadVideoById(currentVideo.video_id)
   }, [currentIndex, displayedVideos])
+
+  // Re-aplicar fullscreen cuando cambia el video de GitHub (algunos navegadores salen del fullscreen al terminar el video)
+  useEffect(() => {
+    if (displayedVideos.length === 0) return
+    const currentVideo = displayedVideos[currentIndex]
+    if (!currentVideo || currentVideo.videoType !== 'github') return
+    if (!wantsFullscreenRef.current || !videoContainerRef.current) return
+
+    // Pequeño delay para que el nuevo video se monte primero
+    const timeoutId = setTimeout(async () => {
+      // Verificar si realmente estamos en fullscreen nativo
+      const isNativeFullscreen = !!(
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
+      )
+
+      // Si el usuario quería fullscreen pero el navegador no está en fullscreen, re-aplicar
+      if (!isNativeFullscreen && !isIOS && videoContainerRef.current && wantsFullscreenRef.current) {
+        console.log('Re-aplicando fullscreen para video de GitHub')
+        try {
+          const fullscreenOptions = { navigationUI: "hide" as const }
+          if (videoContainerRef.current.requestFullscreen) {
+            await videoContainerRef.current.requestFullscreen(fullscreenOptions)
+          } else if (videoContainerRef.current.webkitRequestFullscreen) {
+            await videoContainerRef.current.webkitRequestFullscreen()
+          } else if (videoContainerRef.current.mozRequestFullScreen) {
+            await videoContainerRef.current.mozRequestFullScreen()
+          } else if (videoContainerRef.current.msRequestFullscreen) {
+            await videoContainerRef.current.msRequestFullscreen()
+          }
+        } catch (error) {
+          console.error('Error re-aplicando fullscreen:', error)
+        }
+      }
+    }, 100)
+
+    return () => clearTimeout(timeoutId)
+  }, [currentIndex, displayedVideos, isIOS])
 
   function shuffleArray(array: Video[]) {
     const shuffled = [...array]
@@ -361,6 +403,9 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
 
     try {
       if (!isFullscreen) {
+        // Guardar la intención del usuario
+        wantsFullscreenRef.current = true
+
         // iOS: SIEMPRE usar pseudo-fullscreen (no tiene botones de navegación persistentes)
         // Android: SIEMPRE usar API nativa (única forma de ocultar botones del sistema)
         // Desktop: usar API nativa
@@ -388,6 +433,9 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
           }
         }
       } else {
+        // El usuario quiere salir de fullscreen
+        wantsFullscreenRef.current = false
+
         if (isIOS) {
           // iOS: Salir de pseudo-fullscreen
           console.log('iOS: Saliendo de pseudo-fullscreen')
@@ -428,6 +476,13 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
         document.msFullscreenElement
       )
       setIsFullscreen(isCurrentlyFullscreen)
+
+      // Si salimos del fullscreen y NO estamos en transición de video,
+      // significa que el usuario salió manualmente (ESC, botón, etc)
+      if (!isCurrentlyFullscreen && !isVideoTransitionRef.current) {
+        wantsFullscreenRef.current = false
+      }
+      // Si estamos en transición, mantenemos wantsFullscreenRef para re-aplicar
 
       // Mostrar controles al entrar/salir de fullscreen
       if (isCurrentlyFullscreen) {
@@ -807,7 +862,15 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
                     src={currentVideo.video_id}
                     onEnded={() => {
                       endWatchSession(true)
-                      setTimeout(() => playNextVideo(), 1000)
+                      // Marcar que estamos en transición para mantener el fullscreen
+                      isVideoTransitionRef.current = true
+                      setTimeout(() => {
+                        playNextVideo()
+                        // Limpiar el flag después de un tiempo
+                        setTimeout(() => {
+                          isVideoTransitionRef.current = false
+                        }, 500)
+                      }, 1000)
                     }}
                     onPlay={() => {
                       if (!isTrackingRef.current) {
