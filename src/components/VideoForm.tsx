@@ -14,34 +14,22 @@ function extractYouTubeVideoId(url: string): string | null {
   return (match && match[7].length === 11) ? match[7] : null
 }
 
-function extractGoogleDriveId(url: string): string | null {
+function isGitHubReleaseUrl(url: string): boolean {
   // Soporta URLs como:
-  // https://drive.google.com/file/d/FILE_ID/view
-  // https://drive.google.com/open?id=FILE_ID
-  const patterns = [
-    /\/file\/d\/([a-zA-Z0-9_-]+)/,
-    /[\?&]id=([a-zA-Z0-9_-]+)/,
-  ]
-
-  for (const pattern of patterns) {
-    const match = url.match(pattern)
-    if (match) return match[1]
-  }
-
-  return null
+  // https://github.com/usuario/repo/releases/download/v1.0/video.mp4
+  return /^https:\/\/github\.com\/[^\/]+\/[^\/]+\/releases\/download\//.test(url)
 }
 
-function detectVideoType(url: string): { type: 'youtube' | 'drive' | null, videoId: string | null } {
+function detectVideoType(url: string): { type: 'youtube' | 'github' | null, videoId: string | null } {
   // Intentar YouTube primero
   const youtubeId = extractYouTubeVideoId(url)
   if (youtubeId) {
     return { type: 'youtube', videoId: youtubeId }
   }
 
-  // Intentar Google Drive
-  const driveId = extractGoogleDriveId(url)
-  if (driveId) {
-    return { type: 'drive', videoId: driveId }
+  // Intentar GitHub Releases (la URL completa es el videoId)
+  if (isGitHubReleaseUrl(url)) {
+    return { type: 'github', videoId: url }
   }
 
   return { type: null, videoId: null }
@@ -52,7 +40,7 @@ export function VideoForm({ onVideoAdded }: VideoFormProps) {
   const [url, setUrl] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [detectedType, setDetectedType] = useState<'youtube' | 'drive' | null>(null)
+  const [detectedType, setDetectedType] = useState<'youtube' | 'github' | null>(null)
 
   // Detectar tipo de video cuando cambia la URL
   function handleUrlChange(newUrl: string) {
@@ -78,7 +66,7 @@ export function VideoForm({ onVideoAdded }: VideoFormProps) {
     const { type, videoId } = detectVideoType(url.trim())
 
     if (!type || !videoId) {
-      setError("URL no válida. Por favor ingresa una URL de YouTube o Google Drive")
+      setError("URL no válida. Por favor ingresa una URL de YouTube o GitHub Releases")
       return
     }
 
@@ -137,25 +125,22 @@ export function VideoForm({ onVideoAdded }: VideoFormProps) {
 
         <div>
           <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">
-            URL del video (YouTube o Google Drive)
+            URL del video (YouTube o GitHub Releases)
           </label>
           <Input
             type="url"
             value={url}
             onChange={(e) => handleUrlChange(e.target.value)}
-            placeholder="https://www.youtube.com/watch?v=... o https://drive.google.com/file/d/..."
+            placeholder="https://www.youtube.com/watch?v=... o https://github.com/.../releases/..."
             className="w-full font-mono text-xs md:text-sm"
             disabled={loading}
           />
         </div>
 
-        {/* Advertencia para videos de Google Drive */}
-        {detectedType === 'drive' && (
-          <div className="bg-blue-50 border border-blue-200 text-blue-800 px-3 md:px-4 py-2 md:py-3 rounded text-xs md:text-sm">
-            <p className="font-medium mb-1">Video de Google Drive detectado</p>
-            <p className="text-xs">
-              <strong>Importante:</strong> El video debe estar compartido como &quot;Cualquier persona con el enlace&quot; para que se pueda ver.
-            </p>
+        {/* Info para videos de GitHub */}
+        {detectedType === 'github' && (
+          <div className="bg-green-50 border border-green-200 text-green-800 px-3 md:px-4 py-2 md:py-3 rounded text-xs md:text-sm">
+            <p className="font-medium">Video de GitHub detectado</p>
           </div>
         )}
 
@@ -175,7 +160,7 @@ export function VideoForm({ onVideoAdded }: VideoFormProps) {
       </form>
 
       <p className="text-gray-500 text-xs mt-2 md:mt-3">
-        Formatos soportados: YouTube (youtube.com, youtu.be) y Google Drive
+        Formatos soportados: YouTube (youtube.com, youtu.be) y GitHub Releases
       </p>
     </div>
   )

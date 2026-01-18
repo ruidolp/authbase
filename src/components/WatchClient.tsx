@@ -12,7 +12,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { LocalVideoPlayer } from "@/components/LocalVideoPlayer"
 
 declare global {
   interface Window {
@@ -48,7 +47,7 @@ interface Video {
   video_id: string
   nombre: string
   url: string
-  videoType: string // "youtube" o "drive"
+  videoType: string // "youtube" o "github"
 }
 
 interface WatchClientProps {
@@ -74,6 +73,7 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
     destroy?: () => void
     loadVideoById?: (videoId: string) => void
   } | null>(null)
+  const githubVideoRef = useRef<HTMLVideoElement>(null)
   const videoContainerRef = useRef<HTMLDivElement>(null)
   const sessionIdRef = useRef<number | null>(null)
   const startTimeRef = useRef<number | null>(null)
@@ -793,12 +793,17 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
         <div ref={videoContainerRef} className="w-full">
           <div className="bg-black overflow-hidden mb-1 w-full">
             <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-              {currentVideo?.videoType === 'drive' ? (
-                // Reproductor de video nativo para Google Drive con caché
-                <div className="absolute top-0 left-0 w-full h-full">
-                  <LocalVideoPlayer
-                    videoId={currentVideo.video_id}
-                    familyId={familyId}
+              {currentVideo?.videoType === 'github' ? (
+                // Reproductor de video nativo para GitHub Releases
+                <div className="absolute top-0 left-0 w-full h-full bg-black">
+                  <video
+                    ref={githubVideoRef}
+                    key={currentVideo.video_id}
+                    className="w-full h-full"
+                    controls
+                    autoPlay
+                    playsInline
+                    src={currentVideo.video_id}
                     onEnded={() => {
                       endWatchSession(true)
                       setTimeout(() => playNextVideo(), 1000)
@@ -813,6 +818,7 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
                     onPause={() => {
                       pauseTracking()
                     }}
+                    style={{ objectFit: 'contain' }}
                   />
                 </div>
               ) : (
@@ -902,14 +908,9 @@ export function WatchClient({ familyId, initialVideos, userRole, familySlug }: W
                           unoptimized
                         />
                       ) : (
-                        <Image
-                          src={`https://drive.google.com/thumbnail?id=${video.video_id}&sz=w200`}
-                          alt={video.nombre}
-                          fill
-                          className="object-cover rounded"
-                          sizes="(max-width: 640px) 96px, 112px"
-                          unoptimized
-                        />
+                        <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center">
+                          <Film className="w-8 h-8 text-gray-400" />
+                        </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
